@@ -1,0 +1,4 @@
+node_modules
+pages
+.nyc_output
+coverage

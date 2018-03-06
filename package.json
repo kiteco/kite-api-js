@@ -1,0 +1,49 @@
+{
+  "name": "kite-api",
+  "version": "0.0.0",
+  "description": "API methods to access Kite",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kiteco/kite-api-js.git"
+  },
+  "bugs": "http://github.com/kiteco/kite-api-js/issues",
+  "commits": "http://github.com/kiteco/kite-api-js/commits",
+  "contributors": [
+    {
+      "name": "Cédric Néhémie",
+      "email": "cedric@kite.com"
+    }
+  ],
+  "scripts": {
+    "lint:fix": "eslint --fix .",
+    "lint": "eslint .",
+    "lcov_report": "nyc report --reporter=lcov",
+    "test": "nyc mocha --timeout 5000 --recursive test/*.test.js"
+  },
+  "dependencies": {
+    "analytics-node": "^3.1.1",
+    "getmac": "^1.2.1",
+    "md5": "^2.2.0",
+    "opn": "^1.0.0",
+    "rollbar": "^2.3.8"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.1.1",
+    "eslint-config-fbjs": "^1.1.1",
+    "eslint-config": "^0.3.0",
+    "eslint-plugin-babel": "^4.0.0",
+    "eslint-plugin-flowtype": "^2.29.1",
+    "eslint-plugin-jasmine": "^2.2.0",
+    "eslint-plugin-prefer-object-spread": "^1.1.0",
+    "eslint-plugin-react": "^6.8.0",
+    "eslint": "^3.6.0",
+    "expect.js": "^0.3.1",
+    "fbjs": "^0.8.6",
+    "jsdom": "^9.8.3",
+    "mocha-jsdom": "^1.1.0",
+    "mocha": "^2.3.3",
+    "nyc": "^8.3.0",
+    "sinon": "^2.3.5"
+  }
+}
