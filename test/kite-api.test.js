@@ -9,7 +9,7 @@ const {fakeResponse} = require('kite-connect/test/helpers/http');
 
 const KiteAPI = require('../lib');
 const TestStore = require('./helpers/stores/test');
-const withKiteLogin = require('./helpers/login');
+const {withKiteLogin, withKitePaths} = require('./helpers/kite');
 
 describe('KiteAPI', () => {
   beforeEach(() => {
@@ -134,6 +134,73 @@ describe('KiteAPI', () => {
         it('returns a rejected promise', () => {
           return waitsForPromise({shouldReject: true}, () =>
             KiteAPI.authenticateSessionID('key'));
+        });
+      });
+    });
+  });
+
+  describe('.isPathWhitelisted()', () => {
+    withKite({logged: false}, () => {
+      withKitePaths({}, 401);
+
+      it('returns a rejected promise', () => {
+        return waitsForPromise({shouldReject: true}, () =>
+          KiteAPI.isPathWhitelisted('/path/to/dir'));
+      });
+    });
+
+    withKite({logged: true}, () => {
+      withKitePaths({
+        whitelist: ['/path/to/dir'],
+      });
+
+      describe('called without a path', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.isPathWhitelisted());
+        });
+      });
+
+      describe('passing a path not in the whitelist', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.isPathWhitelisted('/path/to/other/dir'));
+        });
+      });
+
+      describe('passing a path in the whitelist', () => {
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() =>
+            KiteAPI.isPathWhitelisted('/path/to/dir'));
+        });
+      });
+    });
+  });
+
+  describe('.canWhitelistPath()', () => {
+    withKite({logged: false}, () => {
+      withKitePaths({}, 401);
+      it('returns a rejected promise', () => {
+        return waitsForPromise({shouldReject: true}, () =>
+          KiteAPI.canWhitelistPath('/path/to/dir'));
+      });
+    });
+
+    withKite({logged: true}, () => {
+      withKitePaths({
+        whitelist: ['/path/to/dir'],
+      });
+      describe('passing a path in the whitelist', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.canWhitelistPath('/path/to/dir'));
+        });
+      });
+
+      describe('passing a path not in the whitelist', () => {
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() =>
+            KiteAPI.canWhitelistPath('/path/to/other/dir'));
         });
       });
     });
