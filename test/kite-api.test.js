@@ -8,8 +8,14 @@ const {waitsForPromise} = require('kite-connect/test/helpers/async');
 const {fakeResponse} = require('kite-connect/test/helpers/http');
 
 const KiteAPI = require('../lib');
+const TestStore = require('./helpers/stores/test');
+const withKiteLogin = require('./helpers/login');
 
 describe('KiteAPI', () => {
+  beforeEach(() => {
+    KiteAPI.editorConfig.store = new TestStore();
+  });
+
   [
     'checkHealth',
     'request',
@@ -70,22 +76,24 @@ describe('KiteAPI', () => {
 
     withKite({reachable: true}, () => {
       describe('and the authentication succeeds', () => {
-        withKiteRoutes([[
-          o => o.path === '/api/account/login',
-          o => fakeResponse(200, 'authenticated'),
-        ]]);
+        withKiteLogin(200);
 
         it('returns a resolving promise', () => {
           return waitsForPromise(() =>
             KiteAPI.authenticateUser('email', 'password'));
         });
+
+        it('writes the user id in the editor config', () => {
+          return waitsForPromise(() => KiteAPI.authenticateUser('email', 'password'))
+          .then(() => KiteAPI.editorConfig.get('distinctID'))
+          .then(id => {
+            expect(id).to.eql('some-id');
+          });
+        });
       });
 
       describe('and the authentication fails', () => {
-        withKiteRoutes([[
-          o => o.path === '/api/account/login',
-          o => fakeResponse(401),
-        ]]);
+        withKiteLogin(401);
 
         it('returns a rejected promise', () => {
           return waitsForPromise({shouldReject: true}, () =>
@@ -104,22 +112,24 @@ describe('KiteAPI', () => {
 
     withKite({reachable: true}, () => {
       describe('and the authentication succeeds', () => {
-        withKiteRoutes([[
-          o => /^\/api\/account\/authenticate/.test(o.path),
-          o => fakeResponse(200, 'authenticated'),
-        ]]);
+        withKiteLogin(200);
 
         it('returns a resolving promise', () => {
           return waitsForPromise(() =>
             KiteAPI.authenticateSessionID('key'));
         });
+
+        it('writes the user id in the editor config', () => {
+          return waitsForPromise(() => KiteAPI.authenticateUser('email', 'password'))
+          .then(() => KiteAPI.editorConfig.get('distinctID'))
+          .then(id => {
+            expect(id).to.eql('some-id');
+          });
+        });
       });
 
       describe('and the authentication fails', () => {
-        withKiteRoutes([[
-          o => /^\/api\/account\/authenticate/.test(o.path),
-          o => fakeResponse(401),
-        ]]);
+        withKiteLogin(401);
 
         it('returns a rejected promise', () => {
           return waitsForPromise({shouldReject: true}, () =>
