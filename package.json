@@ -16,10 +16,12 @@
     }
   ],
   "scripts": {
+    "coverage": "npm run lcov_report && codecov",
+    "lcov_report": "nyc report --reporter=lcov",
     "lint:fix": "eslint --fix .",
     "lint": "eslint .",
-    "lcov_report": "nyc report --reporter=lcov",
-    "test": "nyc mocha --timeout 5000 --recursive test/*.test.js"
+    "test-nocov": "mocha --timeout 5000 --recursive test/*.test.js test/**/*.test.js",
+    "test": "nyc mocha --timeout 5000 --recursive test/*.test.js test/**/*.test.js"
   },
   "dependencies": {
     "analytics-node": "^3.1.1",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
+    "codecov": "^1.0.0",
     "eslint-config-fbjs": "^1.1.1",
     "eslint-config": "^0.3.0",
     "eslint-plugin-babel": "^4.0.0",
@@ -44,6 +47,7 @@
     "mocha-jsdom": "^1.1.0",
     "mocha": "^2.3.3",
     "nyc": "^8.3.0",
-    "sinon": "^2.3.5"
+    "sinon": "^2.3.5",
+    "kite-connect": "git://github.com/kiteco/kite-connect-js.git#master"
   }
 }
