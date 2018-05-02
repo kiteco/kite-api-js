@@ -205,4 +205,89 @@ describe('KiteAPI', () => {
       });
     });
   });
+
+  describe('.whitelistPath()', () => {
+    withKite({logged: false}, () => {
+      withKitePaths({}, 401);
+      it('returns a rejected promise', () => {
+        return waitsForPromise({shouldReject: true}, () =>
+          KiteAPI.whitelistPath('/path/to/dir'));
+      });
+    });
+
+    withKite({logged: true}, () => {
+      withKitePaths({
+        whitelist: ['/path/to/dir'],
+      });
+
+      describe('passing a path in the whitelist', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.whitelistPath('/path/to/dir'));
+        });
+      });
+
+      describe('passing a path not in the whitelist', () => {
+        describe('and the request succeeds', () => {
+          it('returns a resolving promise', () => {
+            return waitsForPromise(() =>
+            KiteAPI.whitelistPath('/path/to/other/dir'));
+          });
+        });
+
+        describe('and the request fails', () => {
+          withKiteRoutes([[
+            o => /^\/clientapi\/permissions\/whitelist/.test(o.path),
+            o => fakeResponse(500),
+          ]]);
+          it('returns a rejected promise', () => {
+            return waitsForPromise({shouldReject: true}, () =>
+              KiteAPI.whitelistPath('/path/to/other/dir'));
+          });
+        });
+      });
+    });
+  });
+
+  describe('.blacklistPath()', () => {
+    withKite({logged: false}, () => {
+      withKitePaths({}, 401);
+      it('returns a rejected promise', () => {
+        return waitsForPromise({shouldReject: true}, () =>
+          KiteAPI.blacklistPath('/path/to/dir'));
+      });
+    });
+
+    withKite({logged: true}, () => {
+      withKitePaths({
+        whitelist: ['/path/to/dir'],
+      });
+      describe('passing a path in the whitelist', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.blacklistPath('/path/to/dir'));
+        });
+      });
+
+      describe('passing a path not in the whitelist', () => {
+        describe('and the request succeeds', () => {
+          it('returns a resolving promise', () => {
+            return waitsForPromise(() =>
+              KiteAPI.blacklistPath('/path/to/other/dir'));
+          });
+        });
+
+        describe('and the request fails', () => {
+          withKiteRoutes([[
+            o => /^\/clientapi\/permissions\/blacklist/.test(o.path),
+            o => fakeResponse(500),
+          ]]);
+          it('returns a rejected promise', () => {
+            return waitsForPromise({shouldReject: true}, () =>
+              KiteAPI.blacklistPath('/path/to/other/dir'));
+          });
+        });
+      });
+    });
+  });
 });

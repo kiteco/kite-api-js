@@ -33,12 +33,13 @@ function withKiteLogin(status) {
 function withKitePaths(paths = {}, defaultStatus) {
   const authRe = /^\/clientapi\/permissions\/authorized\?filename=(.+)$/;
   const projectDirRe = /^\/clientapi\/projectdir\?filename=(.+)$/;
+
   const whitelisted = match =>
-    (paths.whitelist || []).some(p => match.indexOf(p) !== -1);
+    (paths.whitelist || []).some(p => match.startsWith(p));
   const blacklisted = match =>
-    (paths.blacklist || []).some(p => match.indexOf(p) !== -1);
+    (paths.blacklist || []).some(p => match.startsWith(p));
   const ignored = match =>
-    (paths.ignore || []).some(p => match.indexOf(p) !== -1);
+    (paths.ignore || []).some(p => match.startsWith(p));
 
   const routes = [
     [
@@ -62,6 +63,23 @@ function withKitePaths(paths = {}, defaultStatus) {
     ], [
       o => projectDirRe.test(o.path),
       o => fakeResponse(defaultStatus || 200, os.homedir()),
+    ], [
+      (o, data) => {
+        const [path] = data ? JSON.parse(data) : [];
+        return /^\/clientapi\/permissions\/whitelist/.test(o.path) &&
+               !(whitelisted(path) || blacklisted(path)) &&
+               o.method === 'PUT';
+      },
+      o => fakeResponse(defaultStatus || 200),
+    ], [
+      (o, data) => {
+        data = data ? JSON.parse(data) : {};
+        const path = data.paths ? data.paths[0] : null;
+        return /^\/clientapi\/permissions\/blacklist/.test(o.path) &&
+               !(whitelisted(path) || blacklisted(path)) &&
+               o.method === 'PUT';
+      },
+      o => fakeResponse(defaultStatus || 200),
     ],
   ];
 
