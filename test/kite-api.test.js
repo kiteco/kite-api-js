@@ -1,5 +1,7 @@
 'use strict';
 
+const url = require('url');
+const md5 = require('md5');
 const sinon = require('sinon');
 const expect = require('expect.js');
 const KiteConnector = require('kite-connect');
@@ -10,6 +12,8 @@ const {fakeResponse} = require('kite-connect/test/helpers/http');
 const KiteAPI = require('../lib');
 const TestStore = require('./helpers/stores/test');
 const {withKiteLogin, withKitePaths} = require('./helpers/kite');
+const {loadFixture} = require('./helpers/fixtures');
+const {parseParams} = require('./helpers/urls');
 
 describe('KiteAPI', () => {
   beforeEach(() => {
@@ -286,6 +290,66 @@ describe('KiteAPI', () => {
             return waitsForPromise({shouldReject: true}, () =>
               KiteAPI.blacklistPath('/path/to/other/dir'));
           });
+        });
+      });
+    });
+  });
+
+  describe('.getSupportedLanguages()', () => {
+    withKite({logged: true}, () => {
+      withKiteRoutes([[
+        o => o.path === '/clientapi/languages',
+        o => fakeResponse(200, JSON.stringify(['javascript', 'python'])),
+      ]]);
+
+      it('returns a promise that resolve with the supported languages', () => {
+        return waitsForPromise(() => KiteAPI.getSupportedLanguages())
+        .then(languages => {
+          expect(languages).to.eql(['javascript', 'python']);
+        });
+      });
+    });
+  });
+
+  describe('.getHoverDataAtPosition()', () => {
+    const source = loadFixture('sources/json-dump.py');
+    const filename = '/path/to/json-dump.py';
+    withKite({logged: true}, () => {
+      describe('when the request succeeds', () => {
+        withKiteRoutes([[
+          o => /^\/api\/buffer\/atom/.test(o.path),
+          o => fakeResponse(200, '{"foo": "bar"}'),
+        ]]);
+
+        it('returns a promise that resolve with the returned data', () => {
+          return waitsForPromise(() =>
+            KiteAPI.getHoverDataAtPosition(filename, source, 18))
+          .then(data => {
+            const editorHash = md5(source);
+            const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
+
+            expect(parsedURL.path.indexOf(filename.replace(/\//g, ':'))).not.to.eql(-1);
+            expect(parsedURL.path.indexOf(editorHash)).not.to.eql(-1);
+
+            const params = parseParams(parsedURL.query);
+
+            expect(params.cursor_runes).to.eql('18');
+            expect(data).to.eql({foo: 'bar'});
+          });
+        });
+      });
+
+      describe('when the request fails', () => {
+        withKiteRoutes([
+          [
+            o => /^\/api\/buffer\/atom/.test(o.path),
+            o => fakeResponse(404),
+          ],
+        ]);
+
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.getHoverDataAtPosition(filename, source, 18));
         });
       });
     });
