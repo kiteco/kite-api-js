@@ -653,5 +653,69 @@ describe('KiteAPI', () => {
         });
       });
     });
+
+    describe('.isFileAuthorized()', () => {
+      withKitePaths({
+        whitelist: ['/path/to/dir'],
+      });
+
+      describe('when the file is in the whitelist', () => {
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() =>
+            KiteAPI.isFileAuthorized('/path/to/dir/file.py'));
+        });
+      });
+
+      describe('when the file is not in the whitelist', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.isFileAuthorized('/path/to/other/dir/file.py'));
+        });
+      });
+    });
+
+    describe('.shouldOfferWhitelist()', () => {
+      withKitePaths({
+        whitelist: ['/path/to/dir'],
+        blacklist: ['/path/to/other/dir'],
+        ignore: ['/path/to/ignored/dir'],
+      });
+
+      describe('for a path in the whitelist', () => {
+        it('returns null', () => {
+          return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/dir/file.py'))
+          .then(res => {
+            expect(res).to.eql(null);
+          });
+        });
+      });
+
+      describe('for a path in the blacklist', () => {
+        it('returns null', () => {
+          return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/other/dir/file.py'))
+          .then(res => {
+            expect(res).to.eql(null);
+          });
+        });
+      });
+
+      describe('for a path in the ignore list', () => {
+        it('returns null', () => {
+          return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/ignored/dir/file.py'))
+          .then(res => {
+            expect(res).to.eql(null);
+          });
+        });
+      });
+
+      describe('for a path not in the whitelist', () => {
+        it('returns the preferred path to whitelist', () => {
+          return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/some/file.py'))
+          .then(res => {
+            expect(res).to.eql('/path/to/some');
+          });
+        });
+      });
+    });
   });
 });

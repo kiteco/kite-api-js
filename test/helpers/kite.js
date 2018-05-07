@@ -1,6 +1,6 @@
 'use strict';
 
-const os = require('os');
+const path = require('path');
 const {withKiteRoutes} = require('kite-connect/test/helpers/support');
 const {fakeResponse} = require('kite-connect/test/helpers/http');
 
@@ -33,6 +33,9 @@ function withKiteLogin(status) {
 function withKitePaths(paths = {}, defaultStatus) {
   const authRe = /^\/clientapi\/permissions\/authorized\?filename=(.+)$/;
   const projectDirRe = /^\/clientapi\/projectdir\?filename=(.+)$/;
+  const notifyRe = /^\/clientapi\/permissions\/notify\?filename=(.+)$/;
+  const blacklistRe = /^\/clientapi\/permissions\/blacklist/;
+  const whitelistRe = /^\/clientapi\/permissions\/whitelist/;
 
   const whitelisted = match =>
     (paths.whitelist || []).some(p => match.startsWith(p));
@@ -43,6 +46,17 @@ function withKitePaths(paths = {}, defaultStatus) {
 
   const routes = [
     [
+      o => notifyRe.exec(o.path),
+      o => {
+        const match = notifyRe.exec(o.path);
+        return match &&
+               !whitelisted(match[1]) &&
+               !ignored(match[1]) &&
+               !blacklisted(match[1])
+          ? fakeResponse(200)
+          : fakeResponse(403);
+      },
+    ], [
       o => {
         const match = authRe.exec(o.path);
         return match && whitelisted(match[1]);
@@ -62,11 +76,14 @@ function withKitePaths(paths = {}, defaultStatus) {
       o => fakeResponse(defaultStatus || 403),
     ], [
       o => projectDirRe.test(o.path),
-      o => fakeResponse(defaultStatus || 200, os.homedir()),
+      o => {
+        const match = projectDirRe.exec(o.path);
+        return fakeResponse(defaultStatus || 200, path.dirname(match[1]));
+      },
     ], [
       (o, data) => {
         const [path] = data ? JSON.parse(data) : [];
-        return /^\/clientapi\/permissions\/whitelist/.test(o.path) &&
+        return whitelistRe.test(o.path) &&
                !(whitelisted(path) || blacklisted(path)) &&
                o.method === 'PUT';
       },
@@ -75,7 +92,7 @@ function withKitePaths(paths = {}, defaultStatus) {
       (o, data) => {
         data = data ? JSON.parse(data) : {};
         const path = data.paths ? data.paths[0] : null;
-        return /^\/clientapi\/permissions\/blacklist/.test(o.path) &&
+        return blacklistRe.test(o.path) &&
                !(whitelisted(path) || blacklisted(path)) &&
                o.method === 'PUT';
       },
