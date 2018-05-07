@@ -5,12 +5,12 @@ const path = require('path');
 
 const FIXTURES_ROOT = path.resolve(__dirname, '../fixtures');
 
-function fixturePath(file) {
-  return path.resolve(FIXTURES_ROOT, file);
+function fixturePath(file, root = FIXTURES_ROOT) {
+  return path.resolve(root, file);
 }
 
-function loadFixture(file) {
-  return fs.readFileSync(fixturePath(file));
+function loadFixture(file, root = FIXTURES_ROOT) {
+  return fs.readFileSync(fixturePath(file, root));
 }
 
 module.exports = {loadFixture, fixturePath};
