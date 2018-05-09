@@ -12,8 +12,9 @@ const {fakeResponse} = require('kite-connect/test/helpers/http');
 const KiteAPI = require('../lib');
 const TestStore = require('./helpers/stores/test');
 const {withKiteLogin, withKitePaths} = require('./helpers/kite');
-const {loadFixture} = require('./helpers/fixtures');
+const {loadFixture, getHugeSource} = require('./helpers/fixtures');
 const {parseParams} = require('./helpers/urls');
+const {hasMandatoryArguments} = require('./helpers/arguments');
 
 describe('KiteAPI', () => {
   beforeEach(() => {
@@ -72,6 +73,10 @@ describe('KiteAPI', () => {
   });
 
   describe('.authenticateUser()', () => {
+    hasMandatoryArguments((args) => KiteAPI.authenticateUser(...args), [
+      'email', 'password',
+    ]);
+
     withKite({reachable: false}, () => {
       it('returns a rejected promise', () => {
         waitsForPromise({shouldReject: true}, () => KiteAPI.canAuthenticateUser());
@@ -108,6 +113,10 @@ describe('KiteAPI', () => {
   });
 
   describe('.authenticateSessionID()', () => {
+    hasMandatoryArguments((args) => KiteAPI.authenticateSessionID(...args), [
+      'key',
+    ]);
+
     withKite({reachable: false}, () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({shouldReject: true}, () => KiteAPI.canAuthenticateUser());
@@ -144,6 +153,10 @@ describe('KiteAPI', () => {
   });
 
   describe('.isPathWhitelisted()', () => {
+    hasMandatoryArguments((args) => KiteAPI.isPathWhitelisted(...args), [
+      '/path/to/file.py',
+    ]);
+
     withKite({logged: false}, () => {
       withKitePaths({}, 401);
 
@@ -156,13 +169,6 @@ describe('KiteAPI', () => {
     withKite({logged: true}, () => {
       withKitePaths({
         whitelist: ['/path/to/dir'],
-      });
-
-      describe('called without a path', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.isPathWhitelisted());
-        });
       });
 
       describe('passing a path not in the whitelist', () => {
@@ -182,6 +188,10 @@ describe('KiteAPI', () => {
   });
 
   describe('.canWhitelistPath()', () => {
+    hasMandatoryArguments((args) => KiteAPI.canWhitelistPath(...args), [
+      '/path/to/file.py',
+    ]);
+
     withKite({logged: false}, () => {
       withKitePaths({}, 401);
       it('returns a rejected promise', () => {
@@ -211,6 +221,10 @@ describe('KiteAPI', () => {
   });
 
   describe('.whitelistPath()', () => {
+    hasMandatoryArguments((args) => KiteAPI.whitelistPath(...args), [
+      '/path/to/file.py',
+    ]);
+
     withKite({logged: false}, () => {
       withKitePaths({}, 401);
       it('returns a rejected promise', () => {
@@ -254,6 +268,10 @@ describe('KiteAPI', () => {
   });
 
   describe('.blacklistPath()', () => {
+    hasMandatoryArguments((args) => KiteAPI.blacklistPath(...args), [
+      '/path/to/file.py',
+    ]);
+
     withKite({logged: false}, () => {
       withKitePaths({}, 401);
       it('returns a rejected promise', () => {
@@ -314,6 +332,10 @@ describe('KiteAPI', () => {
       const source = loadFixture('sources/json-dump.py');
       const filename = '/path/to/json-dump.py';
 
+      hasMandatoryArguments((args) => KiteAPI.getHoverDataAtPosition(...args), [
+        filename, source, 18,
+      ]);
+
       describe('when the request succeeds', () => {
         withKiteRoutes([[
           o => /^\/api\/buffer\/atom/.test(o.path),
@@ -357,6 +379,10 @@ describe('KiteAPI', () => {
     describe('.getReportDataAtPosition()', () => {
       const source = loadFixture('sources/json-dump.py');
       const filename = '/path/to/json-dump.py';
+
+      hasMandatoryArguments((args) => KiteAPI.getReportDataAtPosition(...args), [
+        filename, source, 18,
+      ]);
 
       describe('when the hover request succeeds but not the report request', () => {
         withKiteRoutes([
@@ -445,6 +471,10 @@ describe('KiteAPI', () => {
     });
 
     describe('.getValueReportDataForId()', () => {
+      hasMandatoryArguments((args) => KiteAPI.getValueReportDataForId(...args), [
+        'id',
+      ]);
+
       describe('when the request succeeds', () => {
         withKiteRoutes([[
           o => /^\/api\/editor\/value/.test(o.path),
@@ -490,6 +520,10 @@ describe('KiteAPI', () => {
     });
 
     describe('.getMembersDataForId()', () => {
+      hasMandatoryArguments((args) => KiteAPI.getMembersDataForId(...args), [
+        'id',
+      ]);
+
       describe('when the request succeeds', () => {
         withKiteRoutes([[
           o => /^\/api\/editor\/value\/[^\/]+\/members/.test(o.path),
@@ -521,6 +555,10 @@ describe('KiteAPI', () => {
     });
 
     describe('.getUsagesDataForValueId()', () => {
+      hasMandatoryArguments((args) => KiteAPI.getUsageDataForId(...args), [
+        'id',
+      ]);
+
       describe('when the request succeeds', () => {
         withKiteRoutes([[
           o => /^\/api\/editor\/value\/[^\/]+\/usages/.test(o.path),
@@ -552,6 +590,10 @@ describe('KiteAPI', () => {
     });
 
     describe('.getUsageDataForId()', () => {
+      hasMandatoryArguments((args) => KiteAPI.getUsageDataForId(...args), [
+        'id',
+      ]);
+
       describe('when the request succeeds', () => {
         withKiteRoutes([[
           o => /^\/api\/editor\/usages/.test(o.path),
@@ -597,6 +639,10 @@ describe('KiteAPI', () => {
     });
 
     describe('.getExampleDataForId()', () => {
+      hasMandatoryArguments((args) => KiteAPI.getExampleDataForId(...args), [
+        'id',
+      ]);
+
       describe('when the request succeeds', () => {
         withKiteRoutes([[
           o => /^\/api\/python\/curation/.test(o.path),
@@ -659,6 +705,10 @@ describe('KiteAPI', () => {
         whitelist: ['/path/to/dir'],
       });
 
+      hasMandatoryArguments((args) => KiteAPI.isFileAuthorized(...args), [
+        '/some/path/to/a/file.py',
+      ]);
+
       describe('when the file is in the whitelist', () => {
         it('returns a resolving promise', () => {
           return waitsForPromise(() =>
@@ -680,6 +730,10 @@ describe('KiteAPI', () => {
         blacklist: ['/path/to/other/dir'],
         ignore: ['/path/to/ignored/dir'],
       });
+
+      hasMandatoryArguments((args) => KiteAPI.shouldOfferWhitelist(...args), [
+        '/some/path/to/a/file.py',
+      ]);
 
       describe('for a path in the whitelist', () => {
         it('returns null', () => {
@@ -713,6 +767,189 @@ describe('KiteAPI', () => {
           return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/some/file.py'))
           .then(res => {
             expect(res).to.eql('/path/to/some');
+          });
+        });
+      });
+    });
+
+    describe('.getStatus()', () => {
+      describe('when called without a filename', () => {
+        it('returns a promise that resolves to a ready state', () => {
+          return waitsForPromise(() => KiteAPI.getStatus())
+          .then(status => {
+            expect(status).to.eql({status: 'ready'});
+          });
+        });
+      });
+
+      describe('whenever the request fails', () => {
+        withKiteRoutes([[
+          o => /^\/clientapi\/status/.test(o.path),
+          o => fakeResponse(403),
+        ]]);
+        it('returns a promise that resolves to a ready state', () => {
+          return waitsForPromise(() => KiteAPI.getStatus('/path/to/dir/file.py'))
+          .then(status => {
+            expect(status).to.eql({status: 'ready'});
+          });
+        });
+      });
+
+      describe('when kited responds with a status', () => {
+        withKiteRoutes([[
+          o => /^\/clientapi\/status/.test(o.path),
+          o => fakeResponse(200, '{"status": "indexing"}'),
+        ]]);
+        it('returns a promise that resolves to the received state', () => {
+          return waitsForPromise(() => KiteAPI.getStatus('/path/to/dir/file.py'))
+          .then(status => {
+            expect(status).to.eql({status: 'indexing'});
+          });
+        });
+      });
+    });
+
+    describe('.getCompletionsAtPosition()', () => {
+      const source = loadFixture('sources/json-completions.py');
+      const filename = '/path/to/json-completions.py';
+
+      hasMandatoryArguments((args) => KiteAPI.getCompletionsAtPosition(...args), [
+        filename, source, 1, 'editor',
+      ]);
+
+      describe('when there are completions returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/completions',
+          o => fakeResponse(200, loadFixture('responses/json-completions.json')),
+        ]]);
+
+        it('returns a promise that resolves with the completions', () => {
+          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 18, 'editor'))
+          .then(completions => {
+            expect(completions.length).to.eql(12);
+
+            expect(completions[0].display).to.eql('dumps');
+          });
+        });
+      });
+
+      describe('when an error status is returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/completions',
+          o => fakeResponse(404),
+        ]]);
+
+        it('returns a promise that resolves with an empty array', () => {
+          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 18, 'editor'))
+          .then(completions => {
+            expect(completions.length).to.eql(0);
+          });
+        });
+      });
+
+      describe('when the provided file is too big', () => {
+        it('returns a promise that resolves with an empty array without making the request', () => {
+          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, getHugeSource(), 18, 'editor'))
+          .then(completions => {
+            expect(completions.length).to.eql(0);
+
+            expect(KiteConnector.client.request.called).not.to.be.ok();
+          });
+        });
+      });
+    });
+
+    describe('.getSignaturesAtPosition()', () => {
+      const source = loadFixture('sources/json-dump.py');
+      const filename = '/path/to/json-dump.py';
+
+      hasMandatoryArguments((args) => KiteAPI.getSignaturesAtPosition(...args), [
+        filename, source, 1, 'editor',
+      ]);
+
+      describe('when there is a signature returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/signatures',
+          o => fakeResponse(200, loadFixture('responses/json-dump-signature.json')),
+        ]]);
+
+        it('returns a promise that resolves with the completions', () => {
+          return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor'))
+          .then(signature => {
+            expect(signature).not.to.be(undefined);
+          });
+        });
+      });
+
+      describe('when an error status is returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/signatures',
+          o => fakeResponse(404),
+        ]]);
+
+        it('returns a promise that resolves with undefined', () => {
+          return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor'))
+          .then(signature => {
+            expect(signature).to.be(undefined);
+          });
+        });
+      });
+
+      describe('when the provided file is too big', () => {
+        it('returns a promise that resolves with undefined without making the request', () => {
+          return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, getHugeSource(), 18, 'editor'))
+          .then(signature => {
+            expect(signature).to.be(undefined);
+
+            expect(KiteConnector.client.request.called).not.to.be.ok();
+          });
+        });
+      });
+    });
+
+    describe('.getAutocorrectData()', () => {
+      const source = loadFixture('sources/errored.py');
+      const filename = '/path/to/errored.py';
+
+      hasMandatoryArguments((args) => KiteAPI.getAutocorrectData(...args), [
+        filename, source, {},
+      ]);
+
+      describe('when there is a fix to make in the file', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/autocorrect',
+          o => fakeResponse(200, loadFixture('responses/autocorrect-with-fixes.json')),
+        ]]);
+
+        it('returns a promise that resolves with the autocorrect data', () => {
+          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, source, {}))
+          .then(autocorrect => {
+            expect(autocorrect).not.to.be(undefined);
+          });
+        });
+      });
+
+      describe('when the endpoint replies with an error', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/autocorrect',
+          o => fakeResponse(500),
+        ]]);
+
+        it('returns a promise that resolves with undefined', () => {
+          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, source, {}))
+          .then(autocorrect => {
+            expect(autocorrect).to.be(undefined);
+          });
+        });
+      });
+
+      describe('when the provided file is too big', () => {
+        it('returns a promise that resolves with undefined without making the request', () => {
+          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, getHugeSource(), {}))
+          .then(autocorrect => {
+            expect(autocorrect).to.be(undefined);
+
+            expect(KiteConnector.client.request.called).not.to.be.ok();
           });
         });
       });
