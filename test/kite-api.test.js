@@ -954,5 +954,139 @@ describe('KiteAPI', () => {
         });
       });
     });
+
+    describe('.getAutocorrectModelInfo()', () => {
+      hasMandatoryArguments((args) => KiteAPI.getAutocorrectModelInfo(...args), [
+        'version', {},
+      ]);
+
+      describe('when there is model info in the response', () => {
+        withKiteRoutes([[
+          o => o.path === '/api/editor/autocorrect/model-info',
+          o => fakeResponse(200, '{"foo": "bar"}'),
+        ]]);
+
+        it('returns a promise that resolves with the data', () => {
+          return waitsForPromise(() => KiteAPI.getAutocorrectModelInfo('version', {}))
+          .then(autocorrect => {
+            expect(autocorrect).not.to.be({foo: 'bar'});
+          });
+        });
+      });
+
+      describe('when the endpoint replies with an error', () => {
+        withKiteRoutes([[
+          o => o.path === '/api/editor/autocorrect/model-info',
+          o => fakeResponse(500),
+        ]]);
+
+        it('returns a promise that resolves with undefined', () => {
+          return waitsForPromise(() => KiteAPI.getAutocorrectModelInfo('version', {}))
+          .then(autocorrect => {
+            expect(autocorrect).to.be(undefined);
+          });
+        });
+      });
+    });
+
+    describe('.postSaveValidationData()', () => {
+      const source = loadFixture('sources/errored.py');
+      const filename = '/path/to/errored.py';
+
+      hasMandatoryArguments((args) => KiteAPI.postSaveValidationData(...args), [
+        filename, source, {},
+      ]);
+
+      describe('when the endpoint respond with 200', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/autocorrect/validation/on-save',
+          o => fakeResponse(200),
+        ]]);
+
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, source, {}));
+        });
+      });
+
+      describe('when the endpoint replies with an error', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/autocorrect/validation/on-save',
+          o => fakeResponse(500),
+        ]]);
+
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, source, {}));
+        });
+      });
+
+      describe('when the provided file is too big', () => {
+        it('returns a promise that resolves without making the request', () => {
+          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, getHugeSource(), {}))
+          .then(autocorrect => {
+            expect(KiteConnector.client.request.called).not.to.be.ok();
+          });
+        });
+      });
+    });
+
+    describe('.postAutocorrectFeedbackData()', () => {
+      const response = '{"foo": "bar"}';
+
+      hasMandatoryArguments((args) => KiteAPI.postAutocorrectFeedbackData(...args), [
+        response, 1, {},
+      ]);
+
+      describe('when the endpoint respond with 200', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/autocorrect/feedback',
+          o => fakeResponse(200),
+        ]]);
+
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() => KiteAPI.postAutocorrectFeedbackData(response, 1, {}));
+        });
+      });
+
+      describe('when the endpoint replies with an error', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/autocorrect/feedback',
+          o => fakeResponse(500),
+        ]]);
+
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() => KiteAPI.postAutocorrectFeedbackData(response, 1, {}));
+        });
+      });
+    });
+
+    describe('.postAutocorrectHashMismatchData()', () => {
+      const response = '{"foo": "bar"}';
+
+      hasMandatoryArguments((args) => KiteAPI.postAutocorrectHashMismatchData(...args), [
+        response, new Date(), {},
+      ]);
+
+      describe('when the endpoint respond with 200', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/autocorrect/metrics',
+          o => fakeResponse(200),
+        ]]);
+
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() => KiteAPI.postAutocorrectHashMismatchData(response, new Date(), {}));
+        });
+      });
+
+      describe('when the endpoint replies with an error', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/autocorrect/metrics',
+          o => fakeResponse(500),
+        ]]);
+
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() => KiteAPI.postAutocorrectHashMismatchData(response, new Date(), {}));
+        });
+      });
+    });
   });
 });
