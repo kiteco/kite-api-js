@@ -11,7 +11,7 @@ function fixturePath(file, root = FIXTURES_ROOT) {
 }
 
 function loadFixture(file, root = FIXTURES_ROOT) {
-  return fs.readFileSync(fixturePath(file, root));
+  return String(fs.readFileSync(fixturePath(file, root)));
 }
 
 let hugeSource;

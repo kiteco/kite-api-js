@@ -16,6 +16,11 @@ const {loadFixture, getHugeSource} = require('./helpers/fixtures');
 const {parseParams} = require('./helpers/urls');
 const {hasMandatoryArguments} = require('./helpers/arguments');
 
+const mandatoryEditorMeta = {
+  source: 'editor',
+  plugin_version: 'some-version',
+};
+
 describe('KiteAPI', () => {
   beforeEach(() => {
     KiteAPI.editorConfig.store = new TestStore();
@@ -912,7 +917,7 @@ describe('KiteAPI', () => {
       const filename = '/path/to/errored.py';
 
       hasMandatoryArguments((args) => KiteAPI.getAutocorrectData(...args), [
-        filename, source, {},
+        filename, source, mandatoryEditorMeta,
       ]);
 
       describe('when there is a fix to make in the file', () => {
@@ -922,7 +927,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with the autocorrect data', () => {
-          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, source, {}))
+          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, source, mandatoryEditorMeta))
           .then(autocorrect => {
             expect(autocorrect).not.to.be(undefined);
           });
@@ -936,7 +941,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with undefined', () => {
-          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, source, {}))
+          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, source, mandatoryEditorMeta))
           .then(autocorrect => {
             expect(autocorrect).to.be(undefined);
           });
@@ -945,7 +950,7 @@ describe('KiteAPI', () => {
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with undefined without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, getHugeSource(), {}))
+          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, getHugeSource(), mandatoryEditorMeta))
           .then(autocorrect => {
             expect(autocorrect).to.be(undefined);
 
@@ -957,7 +962,7 @@ describe('KiteAPI', () => {
 
     describe('.getAutocorrectModelInfo()', () => {
       hasMandatoryArguments((args) => KiteAPI.getAutocorrectModelInfo(...args), [
-        'version', {},
+        'version', mandatoryEditorMeta,
       ]);
 
       describe('when there is model info in the response', () => {
@@ -967,7 +972,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with the data', () => {
-          return waitsForPromise(() => KiteAPI.getAutocorrectModelInfo('version', {}))
+          return waitsForPromise(() => KiteAPI.getAutocorrectModelInfo('version', mandatoryEditorMeta))
           .then(autocorrect => {
             expect(autocorrect).not.to.be({foo: 'bar'});
           });
@@ -981,7 +986,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with undefined', () => {
-          return waitsForPromise(() => KiteAPI.getAutocorrectModelInfo('version', {}))
+          return waitsForPromise(() => KiteAPI.getAutocorrectModelInfo('version', mandatoryEditorMeta))
           .then(autocorrect => {
             expect(autocorrect).to.be(undefined);
           });
@@ -994,7 +999,7 @@ describe('KiteAPI', () => {
       const filename = '/path/to/errored.py';
 
       hasMandatoryArguments((args) => KiteAPI.postSaveValidationData(...args), [
-        filename, source, {},
+        filename, source, mandatoryEditorMeta,
       ]);
 
       describe('when the endpoint respond with 200', () => {
@@ -1004,7 +1009,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a resolving promise', () => {
-          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, source, {}));
+          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, source, mandatoryEditorMeta));
         });
       });
 
@@ -1015,13 +1020,13 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a resolving promise', () => {
-          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, source, {}));
+          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, source, mandatoryEditorMeta));
         });
       });
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves without making the request', () => {
-          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, getHugeSource(), {}))
+          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, getHugeSource(), mandatoryEditorMeta))
           .then(autocorrect => {
             expect(KiteConnector.client.request.called).not.to.be.ok();
           });
@@ -1033,7 +1038,7 @@ describe('KiteAPI', () => {
       const response = '{"foo": "bar"}';
 
       hasMandatoryArguments((args) => KiteAPI.postAutocorrectFeedbackData(...args), [
-        response, 1, {},
+        response, 1, mandatoryEditorMeta,
       ]);
 
       describe('when the endpoint respond with 200', () => {
@@ -1043,7 +1048,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a resolving promise', () => {
-          return waitsForPromise(() => KiteAPI.postAutocorrectFeedbackData(response, 1, {}));
+          return waitsForPromise(() => KiteAPI.postAutocorrectFeedbackData(response, 1, mandatoryEditorMeta));
         });
       });
 
@@ -1054,7 +1059,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a resolving promise', () => {
-          return waitsForPromise(() => KiteAPI.postAutocorrectFeedbackData(response, 1, {}));
+          return waitsForPromise(() => KiteAPI.postAutocorrectFeedbackData(response, 1, mandatoryEditorMeta));
         });
       });
     });
@@ -1063,7 +1068,7 @@ describe('KiteAPI', () => {
       const response = '{"foo": "bar"}';
 
       hasMandatoryArguments((args) => KiteAPI.postAutocorrectHashMismatchData(...args), [
-        response, new Date(), {},
+        response, new Date(), mandatoryEditorMeta,
       ]);
 
       describe('when the endpoint respond with 200', () => {
@@ -1073,7 +1078,8 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a resolving promise', () => {
-          return waitsForPromise(() => KiteAPI.postAutocorrectHashMismatchData(response, new Date(), {}));
+          return waitsForPromise(() =>
+            KiteAPI.postAutocorrectHashMismatchData(response, new Date(), mandatoryEditorMeta));
         });
       });
 
@@ -1084,7 +1090,8 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a resolving promise', () => {
-          return waitsForPromise(() => KiteAPI.postAutocorrectHashMismatchData(response, new Date(), {}));
+          return waitsForPromise(() =>
+            KiteAPI.postAutocorrectHashMismatchData(response, new Date(), mandatoryEditorMeta));
         });
       });
     });
