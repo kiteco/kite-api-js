@@ -826,7 +826,7 @@ describe('KiteAPI', () => {
       ]);
 
       sendsPayload(() => {
-        KiteAPI.getCompletionsAtPosition(filename, source, 1, 'editor', );
+        KiteAPI.getCompletionsAtPosition(filename, source, 1, 'editor');
       }, {
         text: source,
         editor: 'editor',
@@ -885,7 +885,7 @@ describe('KiteAPI', () => {
       ]);
 
       sendsPayload(() => {
-        KiteAPI.getSignaturesAtPosition(filename, source, 1, 'editor', );
+        KiteAPI.getSignaturesAtPosition(filename, source, 1, 'editor');
       }, {
         text: source,
         editor: 'editor',
