@@ -8,11 +8,12 @@ const KiteConnector = require('kite-connect');
 const {withKite, withKiteRoutes} = require('kite-connect/test/helpers/support');
 const {waitsForPromise} = require('kite-connect/test/helpers/async');
 const {fakeResponse} = require('kite-connect/test/helpers/http');
+const TestClient = require('kite-connect/lib/clients/test-client');
 
 const KiteAPI = require('../lib');
 const {merge} = require('../lib/utils');
 const TestStore = require('./helpers/stores/test');
-const {withKiteLogin, withKitePaths} = require('./helpers/kite');
+const {withKiteLogin, withKitePaths, withKiteAccountRoutes} = require('./helpers/kite');
 const {loadFixture, getHugeSource} = require('./helpers/fixtures');
 const {parseParams} = require('./helpers/urls');
 const {hasMandatoryArguments, sendsPayload} = require('./helpers/arguments');
@@ -1286,6 +1287,229 @@ describe('KiteAPI', () => {
         KiteAPI.featureApplied(name, editor);
         expect(KiteAPI.sendFeatureMetric.called).to.be.ok();
         stub.restore();
+      });
+    });
+  });
+
+
+  describe('.Account', () => {
+    let safeClient;
+
+    beforeEach(() => {
+      safeClient = KiteAPI.Account.client;
+      KiteAPI.Account.client = new TestClient();
+    });
+
+    afterEach(() => {
+      KiteAPI.Account.client = safeClient;
+    });
+
+    describe('.checkEmail()', () => {
+      describe('when the request succeeds', () => {
+        withKiteAccountRoutes([[
+          o => /\/api\/account\/check-email/.test(o.path),
+          o => fakeResponse(200),
+        ]], () => {
+          it('returns a promise that is resolved after calling the endpoint', () => {
+            return waitsForPromise(() => KiteAPI.Account.checkEmail({
+              email: 'foo@bar.com',
+            }));
+          });
+        });
+      });
+
+      describe('when called without an email', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.checkEmail({}));
+        });
+      });
+
+      describe('when called without any data', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.checkEmail());
+        });
+      });
+
+      describe('when the request fails', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.checkEmail({
+            email: 'foo@bar.com',
+          }));
+        });
+      });
+    });
+
+    describe('.createAccount()', () => {
+      describe('when the request succeeds', () => {
+        withKiteAccountRoutes([[
+          o => /\/api\/account\/createPasswordless/.test(o.path),
+          o => fakeResponse(200),
+        ]], () => {
+          it('returns a promise that is resolved after calling the endpoint', () => {
+            return waitsForPromise(() => KiteAPI.Account.createAccount({
+              email: 'foo@bar.com',
+            }));
+          });
+
+          it('calls the provided callback', () => {
+            const spy = sinon.spy();
+            return waitsForPromise(() => KiteAPI.Account.createAccount({
+              email: 'foo@bar.com',
+            }, spy))
+            .then(() => {
+              expect(spy.called).to.be.ok();
+            });
+          });
+        });
+      });
+
+
+      describe('when called with a password', () => {
+        withKiteAccountRoutes([[
+          o => /\/api\/account\/create$/.test(o.path),
+          o => fakeResponse(200),
+        ]], () => {
+          it('returns a promise that is resolved after calling the endpoint', () => {
+            return waitsForPromise(() => KiteAPI.Account.createAccount({
+              email: 'foo@bar.com',
+              password: 'foobarbaz',
+            }));
+          });
+
+          it('calls the provided callback', () => {
+            const spy = sinon.spy();
+            return waitsForPromise(() => KiteAPI.Account.createAccount({
+              email: 'foo@bar.com',
+              password: 'foobarbaz',
+            }, spy).then(() => {
+              expect(spy.called).to.be.ok();
+            }));
+          });
+        });
+      });
+
+      describe('when called without an email', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.createAccount({}));
+        });
+      });
+
+      describe('when called without any data', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.createAccount());
+        });
+      });
+
+      describe('when the request fails', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.createAccount({
+            email: 'foo@bar.com',
+          }));
+        });
+      });
+    });
+
+    describe('.login()', () => {
+      describe('when the request succeeds', () => {
+        withKiteAccountRoutes([[
+          o => /\/api\/account\/login/.test(o.path),
+          o => fakeResponse(200),
+        ]], () => {
+          it('returns a promise that is resolved after calling the endpoint', () => {
+            return waitsForPromise(() => KiteAPI.Account.login({
+              email: 'foo@bar.com',
+              password: 'foo',
+            }));
+          });
+
+          it('calls the provided callback', () => {
+            const spy = sinon.spy();
+            return waitsForPromise(() => KiteAPI.Account.login({
+              email: 'foo@bar.com',
+              password: 'foo',
+            }, spy).then(() => {
+              expect(spy.called).to.be.ok();
+            }));
+          });
+        });
+      });
+
+      describe('when called without an email', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+          KiteAPI.Account.login({
+            password: 'foo',
+          }));
+        });
+      });
+
+      describe('when called without a password', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+          KiteAPI.Account.login({
+            email: 'foo@bar.com',
+          }));
+        });
+      });
+
+      describe('when called without any data', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.login());
+        });
+      });
+
+      describe('when the request fails', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.login({
+            email: 'foo@bar.com',
+            password: 'foo',
+          }));
+        });
+      });
+    });
+
+    describe('.resetPassword()', () => {
+      describe('when the request succeeds', () => {
+        withKiteAccountRoutes([[
+          o => /\/api\/account\/reset-password\/request/.test(o.path),
+          o => fakeResponse(200),
+        ]], () => {
+          it('returns a promise that is resolved after calling the endpoint', () => {
+            return waitsForPromise(() => KiteAPI.Account.resetPassword({
+              email: 'foo@bar.com',
+            }));
+          });
+
+          it('calls the provided callback', () => {
+            const spy = sinon.spy();
+            return waitsForPromise(() => KiteAPI.Account.resetPassword({
+              email: 'foo@bar.com',
+            }, spy))
+            .then(() => {
+              expect(spy.called).to.be.ok();
+            });
+          });
+        });
+      });
+
+      describe('when called without an email', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.resetPassword({}));
+        });
+      });
+
+      describe('when called without any data', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.resetPassword());
+        });
+      });
+
+      describe('when the request fails', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.resetPassword({
+            email: 'foo@bar.com',
+          }));
+        });
       });
     });
   });
