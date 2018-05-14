@@ -28,7 +28,8 @@
     "getmac": "^1.2.1",
     "md5": "^2.2.0",
     "opn": "^1.0.0",
-    "rollbar": "^2.3.8"
+    "rollbar": "^2.3.8",
+    "kite-connect": "git://github.com/kiteco/kite-connect-js.git#master"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
@@ -47,7 +48,6 @@
     "mocha-jsdom": "^1.1.0",
     "mocha": "^2.3.3",
     "nyc": "^8.3.0",
-    "sinon": "^2.3.5",
-    "kite-connect": "git://github.com/kiteco/kite-connect-js.git#master"
+    "sinon": "^2.3.5"
   }
 }
