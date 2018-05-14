@@ -10,11 +10,12 @@ const {waitsForPromise} = require('kite-connect/test/helpers/async');
 const {fakeResponse} = require('kite-connect/test/helpers/http');
 
 const KiteAPI = require('../lib');
+const {merge} = require('../lib/utils');
 const TestStore = require('./helpers/stores/test');
 const {withKiteLogin, withKitePaths} = require('./helpers/kite');
 const {loadFixture, getHugeSource} = require('./helpers/fixtures');
 const {parseParams} = require('./helpers/urls');
-const {hasMandatoryArguments} = require('./helpers/arguments');
+const {hasMandatoryArguments, sendsPayload} = require('./helpers/arguments');
 
 const mandatoryEditorMeta = {
   source: 'editor',
@@ -822,6 +823,15 @@ describe('KiteAPI', () => {
         filename, source, 1, 'editor',
       ]);
 
+      sendsPayload(() => {
+        KiteAPI.getCompletionsAtPosition(filename, source, 1, 'editor', );
+      }, {
+        text: source,
+        editor: 'editor',
+        filename,
+        cursor_runes: 1,
+      });
+
       describe('when there are completions returned by kited', () => {
         withKiteRoutes([[
           o => o.path === '/clientapi/editor/completions',
@@ -872,6 +882,15 @@ describe('KiteAPI', () => {
         filename, source, 1, 'editor',
       ]);
 
+      sendsPayload(() => {
+        KiteAPI.getSignaturesAtPosition(filename, source, 1, 'editor', );
+      }, {
+        text: source,
+        editor: 'editor',
+        filename,
+        cursor_runes: 1,
+      });
+
       describe('when there is a signature returned by kited', () => {
         withKiteRoutes([[
           o => o.path === '/clientapi/editor/signatures',
@@ -920,6 +939,18 @@ describe('KiteAPI', () => {
         filename, source, mandatoryEditorMeta,
       ]);
 
+      sendsPayload(() => {
+        KiteAPI.getAutocorrectData(filename, source, mandatoryEditorMeta);
+      }, {
+        metadata: merge({
+          event: 'autocorrect_request',
+          os_name: KiteAPI.getOsName(),
+        }, mandatoryEditorMeta),
+        buffer: source,
+        filename,
+        language: 'python',
+      });
+
       describe('when there is a fix to make in the file', () => {
         withKiteRoutes([[
           o => o.path === '/clientapi/editor/autocorrect',
@@ -965,6 +996,17 @@ describe('KiteAPI', () => {
         'version', mandatoryEditorMeta,
       ]);
 
+      sendsPayload(() => {
+        KiteAPI.getAutocorrectModelInfo('version', mandatoryEditorMeta);
+      }, {
+        metadata: merge({
+          event: 'model_info_request',
+          os_name: KiteAPI.getOsName(),
+        }, mandatoryEditorMeta),
+        version: 'version',
+        language: 'python',
+      });
+
       describe('when there is model info in the response', () => {
         withKiteRoutes([[
           o => o.path === '/api/editor/autocorrect/model-info',
@@ -1001,6 +1043,18 @@ describe('KiteAPI', () => {
       hasMandatoryArguments((args) => KiteAPI.postSaveValidationData(...args), [
         filename, source, mandatoryEditorMeta,
       ]);
+
+      sendsPayload(() => {
+        KiteAPI.postSaveValidationData(filename, source, mandatoryEditorMeta);
+      }, {
+        metadata: merge({
+          event: 'validation_onsave',
+          os_name: KiteAPI.getOsName(),
+        }, mandatoryEditorMeta),
+        buffer: source,
+        filename,
+        language: 'python',
+      });
 
       describe('when the endpoint respond with 200', () => {
         withKiteRoutes([[
@@ -1041,6 +1095,17 @@ describe('KiteAPI', () => {
         response, 1, mandatoryEditorMeta,
       ]);
 
+      sendsPayload(() => {
+        KiteAPI.postAutocorrectFeedbackData(response, -1, mandatoryEditorMeta);
+      }, {
+        metadata: merge({
+          event: 'feedback_diffset',
+          os_name: KiteAPI.getOsName(),
+        }, mandatoryEditorMeta),
+        response,
+        feedback: -1,
+      });
+
       describe('when the endpoint respond with 200', () => {
         withKiteRoutes([[
           o => o.path === '/clientapi/editor/autocorrect/feedback',
@@ -1066,10 +1131,22 @@ describe('KiteAPI', () => {
 
     describe('.postAutocorrectHashMismatchData()', () => {
       const response = '{"foo": "bar"}';
+      const date = new Date();
 
       hasMandatoryArguments((args) => KiteAPI.postAutocorrectHashMismatchData(...args), [
-        response, new Date(), mandatoryEditorMeta,
+        response, date, mandatoryEditorMeta,
       ]);
+
+      sendsPayload(() => {
+        KiteAPI.postAutocorrectHashMismatchData(response, date, mandatoryEditorMeta);
+      }, {
+        metadata: merge({
+          event: 'metrics_hash_mismatch',
+          os_name: KiteAPI.getOsName(),
+        }, mandatoryEditorMeta),
+        response,
+        response_time: value => expect(value).not.to.be(null),
+      });
 
       describe('when the endpoint respond with 200', () => {
         withKiteRoutes([[
@@ -1079,7 +1156,7 @@ describe('KiteAPI', () => {
 
         it('returns a resolving promise', () => {
           return waitsForPromise(() =>
-            KiteAPI.postAutocorrectHashMismatchData(response, new Date(), mandatoryEditorMeta));
+            KiteAPI.postAutocorrectHashMismatchData(response, date, mandatoryEditorMeta));
         });
       });
 
@@ -1091,7 +1168,7 @@ describe('KiteAPI', () => {
 
         it('returns a resolving promise', () => {
           return waitsForPromise(() =>
-            KiteAPI.postAutocorrectHashMismatchData(response, new Date(), mandatoryEditorMeta));
+            KiteAPI.postAutocorrectHashMismatchData(response, date, mandatoryEditorMeta));
         });
       });
     });
