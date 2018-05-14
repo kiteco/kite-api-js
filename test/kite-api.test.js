@@ -1172,5 +1172,120 @@ describe('KiteAPI', () => {
         });
       });
     });
+
+    describe('.sendFeatureMetric()', () => {
+      const name = 'feature_metric_name';
+
+      hasMandatoryArguments((args) => KiteAPI.sendFeatureMetric(...args), [name]);
+
+      sendsPayload(() => {
+        KiteAPI.sendFeatureMetric(name).catch(err => {});
+      }, {
+        name,
+        value: 1,
+      });
+
+      describe('when the endpoint respond with 200', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/metrics/counters',
+          o => fakeResponse(200),
+        ]]);
+
+        it('returns a resolving promise', () => {
+          return waitsForPromise(() =>
+            KiteAPI.sendFeatureMetric(name));
+        });
+      });
+
+      describe('when the endpoint replies with an error', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/metrics/counters',
+          o => fakeResponse(500),
+        ]]);
+
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.sendFeatureMetric(name));
+        });
+      });
+    });
+
+    describe('.featureRequested()', () => {
+      const name = 'metric';
+      const editor = 'editor';
+
+      withKiteRoutes([[
+        o => o.path === '/clientapi/metrics/counters',
+        o => fakeResponse(200),
+      ]]);
+
+      hasMandatoryArguments((args) => KiteAPI.featureRequested(...args), [name, editor]);
+
+      sendsPayload(() => {
+        KiteAPI.featureRequested(name, editor);
+      }, {
+        name: 'editor_metric_requested',
+        value: 1,
+      });
+
+      it('proxies to sendFeatureMetric', () => {
+        const stub = sinon.stub(KiteAPI, 'sendFeatureMetric');
+        KiteAPI.featureRequested(name, editor);
+        expect(KiteAPI.sendFeatureMetric.called).to.be.ok();
+        stub.restore();
+      });
+    });
+
+    describe('.featureFulfilled()', () => {
+      const name = 'metric';
+      const editor = 'editor';
+
+      withKiteRoutes([[
+        o => o.path === '/clientapi/metrics/counters',
+        o => fakeResponse(200),
+      ]]);
+
+      hasMandatoryArguments((args) => KiteAPI.featureFulfilled(...args), [name, editor]);
+
+      sendsPayload(() => {
+        KiteAPI.featureFulfilled(name, editor);
+      }, {
+        name: 'editor_metric_fulfilled',
+        value: 1,
+      });
+
+      it('proxies to sendFeatureMetric', () => {
+        const stub = sinon.stub(KiteAPI, 'sendFeatureMetric');
+        KiteAPI.featureFulfilled(name, editor);
+        expect(KiteAPI.sendFeatureMetric.called).to.be.ok();
+        stub.restore();
+      });
+    });
+
+    describe('.featureApplied()', () => {
+      const name = 'metric';
+      const editor = 'editor';
+
+      withKiteRoutes([[
+        o => o.path === '/clientapi/metrics/counters',
+        o => fakeResponse(200),
+      ]]);
+
+      hasMandatoryArguments((args) => KiteAPI.featureApplied(...args), [name, editor]);
+
+      sendsPayload(() => {
+        KiteAPI.featureApplied(name, editor, '_suffix');
+      }, {
+        name: 'editor_metric_applied_suffix',
+        value: 1,
+      });
+
+      it('proxies to sendFeatureMetric', () => {
+        const stub = sinon.stub(KiteAPI, 'sendFeatureMetric');
+        KiteAPI.featureApplied(name, editor);
+        expect(KiteAPI.sendFeatureMetric.called).to.be.ok();
+        stub.restore();
+      });
+    });
   });
 });
