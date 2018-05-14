@@ -49,6 +49,7 @@ describe('KiteAPI', () => {
     'isKiteReachable',
     'waitForKite',
     'isUserAuthenticated',
+    'toggleRequestDebug',
   ].forEach(method => {
     it(`delegates calls to ${method} to the connector`, () => {
       const stub = sinon.stub(KiteConnector, method).callsFake(() => {});
