@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const {withKiteRoutes} = require('kite-connect/test/helpers/support');
+const {withKite, withKiteRoutes} = require('kite-connect/test/helpers/kite');
 const {fakeResponse} = require('kite-connect/test/helpers/http');
 const KiteAPI = require('../../lib');
 
@@ -124,6 +124,8 @@ function withKiteAccountRoutes(routes = [], block) {
 }
 
 module.exports = {
+  withKite,
+  withKiteRoutes,
   withKiteLogin,
   withKitePaths,
   withKiteAccountRoutes,
