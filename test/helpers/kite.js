@@ -3,6 +3,7 @@
 const path = require('path');
 const {withKite, withKiteRoutes} = require('kite-connect/test/helpers/kite');
 const {fakeResponse} = require('kite-connect/test/helpers/http');
+const TestClient = require('kite-connect/lib/clients/test-client');
 const KiteAPI = require('../../lib');
 
 function withKiteLogin(status) {
@@ -105,8 +106,16 @@ function withKitePaths(paths = {}, defaultStatus) {
 }
 
 function withKiteAccountRoutes(routes = [], block) {
+  let safeClient;
+
   beforeEach(() => {
+    safeClient = KiteAPI.Account.client;
+    KiteAPI.Account.client = new TestClient();
     routes.forEach(route => KiteAPI.Account.client.addRoute(route));
+  });
+
+  afterEach(() => {
+    KiteAPI.Account.client = safeClient;
   });
 
   if (block) {

@@ -1292,17 +1292,6 @@ describe('KiteAPI', () => {
 
 
   describe('.Account', () => {
-    let safeClient;
-
-    beforeEach(() => {
-      safeClient = KiteAPI.Account.client;
-      KiteAPI.Account.client = new TestClient();
-    });
-
-    afterEach(() => {
-      KiteAPI.Account.client = safeClient;
-    });
-
     describe('.checkEmail()', () => {
       describe('when the request succeeds', () => {
         withKiteAccountRoutes([[
@@ -1330,10 +1319,12 @@ describe('KiteAPI', () => {
       });
 
       describe('when the request fails', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.checkEmail({
-            email: 'foo@bar.com',
-          }));
+        withKiteAccountRoutes([], () => {
+          it('returns a rejected promise', () => {
+            return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.checkEmail({
+              email: 'foo@bar.com',
+            }));
+          });
         });
       });
     });
@@ -1400,10 +1391,12 @@ describe('KiteAPI', () => {
       });
 
       describe('when the request fails', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.createAccount({
-            email: 'foo@bar.com',
-          }));
+        withKiteAccountRoutes([], () => {
+          it('returns a rejected promise', () => {
+            return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.createAccount({
+              email: 'foo@bar.com',
+            }));
+          });
         });
       });
     });
@@ -1458,11 +1451,13 @@ describe('KiteAPI', () => {
       });
 
       describe('when the request fails', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.login({
-            email: 'foo@bar.com',
-            password: 'foo',
-          }));
+        withKiteAccountRoutes([], () => {
+          it('returns a rejected promise', () => {
+            return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.login({
+              email: 'foo@bar.com',
+              password: 'foo',
+            }));
+          });
         });
       });
     });
@@ -1504,10 +1499,12 @@ describe('KiteAPI', () => {
       });
 
       describe('when the request fails', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.resetPassword({
-            email: 'foo@bar.com',
-          }));
+        withKiteAccountRoutes([], () => {
+          it('returns a rejected promise', () => {
+            return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.resetPassword({
+              email: 'foo@bar.com',
+            }));
+          });
         });
       });
     });
