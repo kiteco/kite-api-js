@@ -32,7 +32,7 @@ function withKiteLogin(status) {
   ]]);
 }
 
-function withKitePaths(paths = {}, defaultStatus) {
+function withKitePaths(paths = {}, defaultStatus, block) {
   const authRe = /^\/clientapi\/permissions\/authorized\?filename=(.+)$/;
   const projectDirRe = /^\/clientapi\/projectdir\?filename=(.+)$/;
   const notifyRe = /^\/clientapi\/permissions\/notify\?filename=(.+)$/;
@@ -102,7 +102,7 @@ function withKitePaths(paths = {}, defaultStatus) {
     ],
   ];
 
-  withKiteRoutes(routes);
+  withKiteRoutes(routes, block);
 }
 
 function withKiteAccountRoutes(routes = [], block) {
