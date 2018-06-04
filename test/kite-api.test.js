@@ -50,6 +50,9 @@ describe('KiteAPI', () => {
     'waitForKite',
     'isUserAuthenticated',
     'toggleRequestDebug',
+    'hasBothKiteInstalled',
+    'hasManyKiteInstallation',
+    'hasManyKiteEnterpriseInstallation',
   ].forEach(method => {
     it(`delegates calls to ${method} to the connector`, () => {
       const stub = sinon.stub(KiteConnector, method).callsFake(() => {});
