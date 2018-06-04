@@ -340,24 +340,25 @@ describe('KiteAPI', () => {
       const filename = '/path/to/json-dump.py';
 
       hasMandatoryArguments((args) => KiteAPI.getHoverDataAtPosition(...args), [
-        filename, source, 18,
+        filename, source, 18, 'editor',
       ]);
 
       describe('when the request succeeds', () => {
         withKiteRoutes([[
-          o => /^\/api\/buffer\/atom/.test(o.path),
+          o => /^\/api\/buffer\/editor/.test(o.path),
           o => fakeResponse(200, '{"foo": "bar"}'),
         ]]);
 
         it('returns a promise that resolve with the returned data', () => {
           return waitsForPromise(() =>
-            KiteAPI.getHoverDataAtPosition(filename, source, 18))
+            KiteAPI.getHoverDataAtPosition(filename, source, 18, 'editor'))
           .then(data => {
             const editorHash = md5(source);
             const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
 
             expect(parsedURL.path.indexOf(filename.replace(/\//g, ':'))).not.to.eql(-1);
             expect(parsedURL.path.indexOf(editorHash)).not.to.eql(-1);
+            expect(parsedURL.path.indexOf('/editor/')).not.to.eql(-1);
 
             const params = parseParams(parsedURL.query);
 
@@ -370,14 +371,14 @@ describe('KiteAPI', () => {
       describe('when the request fails', () => {
         withKiteRoutes([
           [
-            o => /^\/api\/buffer\/atom/.test(o.path),
+            o => /^\/api\/buffer\/editor/.test(o.path),
             o => fakeResponse(404),
           ],
         ]);
 
         it('returns a rejected promise', () => {
           return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.getHoverDataAtPosition(filename, source, 18));
+            KiteAPI.getHoverDataAtPosition(filename, source, 18, 'editor'));
         });
       });
 
@@ -388,13 +389,13 @@ describe('KiteAPI', () => {
       const filename = '/path/to/json-dump.py';
 
       hasMandatoryArguments((args) => KiteAPI.getReportDataAtPosition(...args), [
-        filename, source, 18,
+        filename, source, 18, 'editor',
       ]);
 
       describe('when the hover request succeeds but not the report request', () => {
         withKiteRoutes([
           [
-            o => /^\/api\/buffer\/atom/.test(o.path),
+            o => /^\/api\/buffer\/editor/.test(o.path),
             o => fakeResponse(200, JSON.stringify({
               symbol: [{
                 id: 'foo',
@@ -408,7 +409,7 @@ describe('KiteAPI', () => {
         ]);
 
         it('returns a promise that resolve with the returned hover data', () => {
-          return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18))
+          return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor'))
           .then(data => {
             const editorHash = md5(source);
             const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
@@ -431,7 +432,7 @@ describe('KiteAPI', () => {
       describe('when both the hover request and the report request succeeds', () => {
         withKiteRoutes([
           [
-            o => /^\/api\/buffer\/atom/.test(o.path),
+            o => /^\/api\/buffer\/editor/.test(o.path),
             o => fakeResponse(200, JSON.stringify({
               symbol: [{
                 id: 'foo',
@@ -445,7 +446,7 @@ describe('KiteAPI', () => {
         ]);
 
         it('returns a promise that resolve with both the returned report data', () => {
-          return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18))
+          return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor'))
           .then(data => {
             const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
             expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
@@ -466,13 +467,13 @@ describe('KiteAPI', () => {
       describe('when the hover request fails', () => {
         withKiteRoutes([
           [
-            o => /^\/api\/buffer\/atom/.test(o.path),
+            o => /^\/api\/buffer\/editor/.test(o.path),
             o => fakeResponse(404),
           ],
         ]);
 
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getReportDataAtPosition(filename, source, 18));
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor'));
         });
       });
     });
