@@ -7,11 +7,10 @@ const expect = require('expect.js');
 const KiteConnector = require('kite-connect');
 const {waitsForPromise} = require('kite-connect/test/helpers/async');
 const {fakeResponse} = require('kite-connect/test/helpers/http');
-const TestClient = require('kite-connect/lib/clients/test-client');
 
 const KiteAPI = require('../lib');
 const {merge} = require('../lib/utils');
-const TestStore = require('./helpers/stores/test');
+const MemoryStore = require('../lib/stores/memory');
 const {withKite, withKiteRoutes, withKiteLogin, withKitePaths, withKiteAccountRoutes} = require('./helpers/kite');
 const {loadFixture, getHugeSource} = require('./helpers/fixtures');
 const {parseParams} = require('./helpers/urls');
@@ -24,7 +23,7 @@ const mandatoryEditorMeta = {
 
 describe('KiteAPI', () => {
   beforeEach(() => {
-    KiteAPI.editorConfig.store = new TestStore();
+    KiteAPI.editorConfig.store = new MemoryStore();
   });
 
   [

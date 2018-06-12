@@ -3,13 +3,13 @@
 const expect = require('expect.js');
 const {waitsForPromise} = require('kite-connect/test/helpers/async');
 const EditorConfig = require('../lib/editor-config');
-const TestStore = require('./helpers/stores/test');
+const MemoryStore = require('../lib/stores/memory');
 
 describe('EditorConfig', () => {
   let editorConfig, store;
 
   beforeEach(() => {
-    store = new TestStore();
+    store = new MemoryStore();
     editorConfig = new EditorConfig(store);
   });
 
