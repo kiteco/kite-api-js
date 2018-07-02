@@ -49,8 +49,15 @@ function withKitePaths(paths = {}, defaultStatus, block) {
 
   const routes = [
     [
-      o => eventRe.test(o.path),
-      (o, r) => whitelisted(JSON.parse(r.data).filename) ? fakeResponse(200) : fakeResponse(403),
+      o => {
+        return o.method === 'POST' && eventRe.test(o.path);
+      },
+      (o, data) => {
+        return data &&
+               whitelisted(JSON.parse(data).filename)
+                ? fakeResponse(200)
+                : fakeResponse(403);
+      },
     ], [
       o => notifyRe.exec(o.path),
       o => {
@@ -88,7 +95,8 @@ function withKitePaths(paths = {}, defaultStatus, block) {
       },
     ], [
       (o, data) => {
-        const [path] = data ? JSON.parse(data) : [];
+        data = data && JSON.parse(data);
+        const [path] = data && Array.isArray(data) ? data : [];
         return whitelistRe.test(o.path) &&
                !(whitelisted(path) || blacklisted(path)) &&
                o.method === 'PUT';
