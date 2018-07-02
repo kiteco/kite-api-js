@@ -46,17 +46,141 @@ KiteAPI.editorConfig.set('path.to.some.data', 'data')
 This function is both a proxy to the `KiteConnector` method of the same name as well as calling the corresponding function on the `Account` object.
 
 #### .onDidDetectWhitelistedPath(listener)
+
+Registers a listener to the `did-detect-whitelisted-path` event and will be notified when a request for an editor API responds with a `200`. The listener will be invoked with the path that have been detected as whitelisted.
+
+The function returns a disposable object to unregister the listener from this event.
+
+```js
+const disposable = KiteAPI.onDidDetectWhitelistedPath(path => {
+  // path is whitelisted
+})
+
+disposable.dispose(); // the listener will no longer receive events
+```
+
 #### .onDidDetectNonWhitelistedPath(listener)
+
+Registers a listener to the `did-detect-non-whitelisted-path` event and will be notified when a request for an editor API responds with a `403`. The listener will be invoked with the path that have been detected as not whitelisted.
+
+The function returns a disposable object to unregister the listener from this event.
+
+```js
+const disposable = KiteAPI.onDidDetectNonWhitelistedPath(path => {
+  // path is not whitelisted
+})
+
+disposable.dispose(); // the listener will no longer receive events
+```
+
 #### .requestJSON(options, data, timeout)
+
+Makes a request to Kite using [`KiteConnector.request`](https://github.com/kiteco/kite-connect-js/blob/master/README.md#requestoptions-data-timeout) and automatically parses the JSON response when the status code was `200`.
+
+```js
+KiteAPI.requestJSON({path}).then(data => {
+  // data is the result of JSON.parse on the response text
+})
+```
+
 #### .canAuthenticateUser()
+
+Returns a promise that resolves if a user can be authenticated. A user can be authenticated if Kite is reachable and if the user is not already logged into Kite.
+
+```js
+KiteAPI.canAuthenticateUser().then(() => {
+  // user can be authenticated
+})
+```
+
 #### .authenticateUser(email, password)
+
+Makes a request to authenticate the user through Kite and returns a promise that will resolve if the authentication succeeds.
+
+```js
+KiteAPI.authenticateUser('john@doe.com', 'password')
+.then(() => {
+  // User is logged in
+})
+.catch(err => {
+  // authentication failed
+})
+```
+
 #### .authenticateSessionID(key)
-#### .saveUserID()
+
+Makes a request to authenticate a user using a session id and returns a promise that will resolve if the authentication succeeds. This function can be used to authenticate a user in Kite whose account have been created using `kite.com` API.
+
+```js
+KiteAPI.authenticateSessionID('session-id')
+.then(() => {
+  // User is logged in
+})
+.catch(err => {
+  // authentication failed
+})
+```
+
 #### .isPathWhitelisted(path)
+
+Returns a promise that resolves if the `path` is part of the whitelist, otherwise the promise will be rejected.
+
+When calling that function, depending on the outcome, a `did-detect-whitelisted-path` or `did-detect-non-whitelisted-path` event will be dispatched.
+
+```js
+KiteAPI.isPathWhitelisted(path)
+.then(() => {
+  // path is whitelisted
+})
+.catch(err => {
+  // path is not whitelisted or an error occurred
+  // err contains the details of the failure
+})
+```
+
 #### .canWhitelistPath(path)
+
+Returns a promise that resolves if the `path` can be whitelisted.
+A path can be whitelisted if it's not already part of the whitelist and if the `projectdir` endpoint responds with a `200`.
+
+In case of success, the promise resolves with the path returned by the `projectdir` endpoint.
+
+```js
+KiteAPI.canWhitelistPath(path).then(projectDir => {
+  // projectDir can be sent to the whitelist endpoint
+})
+```
+
 #### .whitelistPath(path)
+
+Makes a request to the whitelist endpoint and returns a promise that resolves if the path have been successfully whitelisted.
+
+```js
+KiteAPI.whitelistPath(path).then(() => {
+  // path is now whitelisted
+})
+```
+
 #### .blacklistPath(path, noAction)
+
+Makes a request to the blacklist endpoint and returns a promise that resolves if the path have been successfully blacklisted. The `noAction` parameters will allow to set the `closed_whitelist_notification_without_action` value in the request, it defaults to `false`.
+
+```js
+KiteAPI.blacklistPath(path).then(() => {
+  // path is now blacklisted
+})
+```
+
 #### .getSupportedLanguages()
+
+Makes a request to the languages endpoint and returns a promise that resolves with an array of the supported languages.
+
+```js
+KiteAPI.getSupportedLanguages().then(languages => {
+  // do something with languages
+})
+```
+
 #### .getHoverDataAtPosition(filename, source, position, editor)
 #### .getReportDataAtPosition(filename, source, position, editor)
 #### .getSymbolReportDataForId(id)
