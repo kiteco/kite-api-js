@@ -33,6 +33,7 @@ function withKiteLogin(status) {
 }
 
 function withKitePaths(paths = {}, defaultStatus, block) {
+  const eventRe = /^\/clientapi\/editor\/event$/;
   const authRe = /^\/clientapi\/permissions\/authorized\?filename=(.+)$/;
   const projectDirRe = /^\/clientapi\/projectdir\?filename=(.+)$/;
   const notifyRe = /^\/clientapi\/permissions\/notify\?filename=(.+)$/;
@@ -48,6 +49,9 @@ function withKitePaths(paths = {}, defaultStatus, block) {
 
   const routes = [
     [
+      o => eventRe.test(o.path),
+      (o, r) => whitelisted(JSON.parse(r.data).filename) ? fakeResponse(200) : fakeResponse(403),
+    ], [
       o => notifyRe.exec(o.path),
       o => {
         const match = notifyRe.exec(o.path);
