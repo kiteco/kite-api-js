@@ -32,6 +32,14 @@ function withKiteLogin(status) {
   ]]);
 }
 
+let kitedPaths = {};
+
+function updateKitePaths(paths) {
+  for (const k in paths) {
+    kitedPaths[k] = paths[k];
+  }
+}
+
 function withKitePaths(paths = {}, defaultStatus, block) {
   const eventRe = /^\/clientapi\/editor\/event$/;
   const authRe = /^\/clientapi\/permissions\/authorized\?filename=(.+)$/;
@@ -41,11 +49,11 @@ function withKitePaths(paths = {}, defaultStatus, block) {
   const whitelistRe = /^\/clientapi\/permissions\/whitelist/;
 
   const whitelisted = match =>
-    (paths.whitelist || []).some(p => match.startsWith(p));
+    (kitedPaths.whitelist || []).some(p => match.startsWith(p));
   const blacklisted = match =>
-    (paths.blacklist || []).some(p => match.startsWith(p));
+    (kitedPaths.blacklist || []).some(p => match.startsWith(p));
   const ignored = match =>
-    (paths.ignore || []).some(p => match.startsWith(p));
+    (kitedPaths.ignore || []).some(p => match.startsWith(p));
 
   const routes = [
     [
@@ -113,7 +121,7 @@ function withKitePaths(paths = {}, defaultStatus, block) {
       o => fakeResponse(defaultStatus || 200),
     ],
   ];
-
+  beforeEach(() => { updateKitePaths(paths); });
   withKiteRoutes(routes, block);
 }
 
@@ -145,6 +153,7 @@ function withKiteAccountRoutes(routes = [], block) {
 }
 
 module.exports = {
+  updateKitePaths,
   withKite,
   withKiteRoutes,
   withKiteLogin,
