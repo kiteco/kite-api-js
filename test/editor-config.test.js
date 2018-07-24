@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('expect.js');
-const {waitsForPromise} = require('kite-connect/test/helpers/async');
+const {waitsForPromise} = require('kite-connector/test/helpers/async');
 const EditorConfig = require('../lib/editor-config');
 const MemoryStore = require('../lib/stores/memory');
 

@@ -3,7 +3,7 @@
 const fs = require('fs');
 const sinon = require('sinon');
 const expect = require('expect.js');
-const {waitsForPromise} = require('kite-connect/test/helpers/async');
+const {waitsForPromise} = require('kite-connector/test/helpers/async');
 
 const FileStore = require('../../lib/stores/file');
 

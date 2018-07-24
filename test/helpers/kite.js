@@ -1,9 +1,9 @@
 'use strict';
 
 const path = require('path');
-const {withKite, withKiteRoutes} = require('kite-connect/test/helpers/kite');
-const {fakeResponse} = require('kite-connect/test/helpers/http');
-const TestClient = require('kite-connect/lib/clients/test-client');
+const {withKite, withKiteRoutes} = require('kite-connector/test/helpers/kite');
+const {fakeResponse} = require('kite-connector/test/helpers/http');
+const TestClient = require('kite-connector/lib/clients/test-client');
 const KiteAPI = require('../../lib');
 
 function withKiteLogin(status) {

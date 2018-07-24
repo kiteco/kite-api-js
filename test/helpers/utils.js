@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require('kite-connect/test/helpers/utils');
+module.exports = require('kite-connector/test/helpers/utils');

@@ -4,9 +4,9 @@ const url = require('url');
 const md5 = require('md5');
 const sinon = require('sinon');
 const expect = require('expect.js');
-const KiteConnector = require('kite-connect');
-const {waitsForPromise} = require('kite-connect/test/helpers/async');
-const {fakeResponse} = require('kite-connect/test/helpers/http');
+const KiteConnector = require('kite-connector');
+const {waitsForPromise} = require('kite-connector/test/helpers/async');
+const {fakeResponse} = require('kite-connector/test/helpers/http');
 
 const KiteAPI = require('../lib');
 const {merge} = require('../lib/utils');

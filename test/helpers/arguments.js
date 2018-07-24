@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('expect.js');
-const KiteConnector = require('kite-connect');
+const KiteConnector = require('kite-connector');
 const {reject} = require('../../lib/utils');
 
 function hasMandatoryArguments(invoke, args) {
