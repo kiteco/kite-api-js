@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "md5": "^2.2.0",
-    "kite-connect": "git://github.com/kiteco/kite-connect-js.git#master"
+    "kite-connector": "^1.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
