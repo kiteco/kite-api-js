@@ -53,7 +53,7 @@ function withKitePaths(paths = {}, defaultStatus, block) {
   const blacklisted = match =>
     (kitedPaths.blacklist || []).some(p => match.startsWith(p));
   const ignored = match =>
-    (kitedPaths.ignore || []).some(p => match.startsWith(p));
+    (kitedPaths.ignored || []).some(p => match.startsWith(p));
 
   const routes = [
     [
@@ -61,8 +61,14 @@ function withKitePaths(paths = {}, defaultStatus, block) {
         return o.method === 'POST' && eventRe.test(o.path);
       },
       (o, data) => {
+        let filename;
+        if (data) {
+          ({filename} = JSON.parse(data));
+        }
+
         return data &&
-               whitelisted(JSON.parse(data).filename)
+               whitelisted(filename) &&
+               !ignored(filename)
                 ? fakeResponse(200)
                 : fakeResponse(403);
       },
@@ -80,7 +86,7 @@ function withKitePaths(paths = {}, defaultStatus, block) {
     ], [
       o => {
         const match = authRe.exec(o.path);
-        return match && whitelisted(match[1]);
+        return match && whitelisted(match[1]) && !ignored(match[1]);
       },
       o => fakeResponse(defaultStatus || 200),
     ], [
