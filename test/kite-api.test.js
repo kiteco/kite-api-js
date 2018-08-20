@@ -742,7 +742,7 @@ describe('KiteAPI', () => {
       withKitePaths({
         whitelist: ['/path/to/dir'],
         blacklist: ['/path/to/other/dir'],
-        ignore: ['/path/to/ignored/dir'],
+        ignored: ['/path/to/ignored/dir'],
       });
 
       hasMandatoryArguments((args) => KiteAPI.shouldOfferWhitelist(...args), [
