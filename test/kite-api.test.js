@@ -189,12 +189,34 @@ describe('KiteAPI', () => {
           return waitsForPromise({shouldReject: true}, () =>
             KiteAPI.isPathWhitelisted('/path/to/other/dir'));
         });
+
+        it('emits a did-detect-non-whitelisted-path event', () => {
+          const spy = sinon.spy();
+          KiteAPI.onDidDetectNonWhitelistedPath(spy);
+
+          return waitsForPromise({shouldReject: true}, () =>
+            KiteAPI.isPathWhitelisted('/path/to/other/dir'))
+          .then(() => {
+            expect(spy.called).to.be.ok();
+          });
+        });
       });
 
       describe('passing a path in the whitelist', () => {
         it('returns a resolving promise', () => {
           return waitsForPromise(() =>
             KiteAPI.isPathWhitelisted('/path/to/dir'));
+        });
+
+        it('emits a did-detect-whitelisted-path event', () => {
+          const spy = sinon.spy();
+          KiteAPI.onDidDetectWhitelistedPath(spy);
+
+          return waitsForPromise(() =>
+            KiteAPI.isPathWhitelisted('/path/to/dir'))
+          .then(() => {
+            expect(spy.called).to.be.ok();
+          });
         });
       });
     });
