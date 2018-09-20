@@ -2,6 +2,8 @@
 
 const url = require('url');
 const md5 = require('md5');
+const http = require('http');
+const https = require('https');
 const sinon = require('sinon');
 const expect = require('expect.js');
 const KiteConnector = require('kite-connector');
@@ -1321,6 +1323,44 @@ describe('KiteAPI', () => {
 
 
   describe('.Account', () => {
+    describe('.initClient()', () => {
+      it('properly passes protocol to the client', () => {
+        KiteAPI.Account.initClient('foo.com', 80, 'foo');
+
+        expect(KiteAPI.Account.client.hostname).to.eql('foo.com');
+        expect(KiteAPI.Account.client.port).to.eql(80);
+        expect(KiteAPI.Account.client.base).to.eql('foo');
+        expect(KiteAPI.Account.client.protocol).to.eql(http);
+
+        KiteAPI.Account.initClient('bar.com', 120, 'bar', true);
+
+        expect(KiteAPI.Account.client.hostname).to.eql('bar.com');
+        expect(KiteAPI.Account.client.port).to.eql(120);
+        expect(KiteAPI.Account.client.base).to.eql('bar');
+        expect(KiteAPI.Account.client.protocol).to.eql(https);
+      });
+    });
+
+    describe('.toggleRequestDebug()', () => {
+      it('properly passes protocol to the client', () => {
+        KiteAPI.Account.initClient('foo.com', 80, 'foo', true);
+
+        KiteAPI.Account.toggleRequestDebug();
+
+        expect(KiteAPI.Account.client.hostname).to.eql('foo.com');
+        expect(KiteAPI.Account.client.port).to.eql(80);
+        expect(KiteAPI.Account.client.base).to.eql('foo');
+        expect(KiteAPI.Account.client.protocol).to.eql('https');
+
+        KiteAPI.Account.toggleRequestDebug();
+
+        expect(KiteAPI.Account.client.hostname).to.eql('foo.com');
+        expect(KiteAPI.Account.client.port).to.eql(80);
+        expect(KiteAPI.Account.client.base).to.eql('foo');
+        expect(KiteAPI.Account.client.protocol).to.eql(https);
+      });
+    });
+
     describe('.checkEmail()', () => {
       describe('when the request succeeds', () => {
         withKiteAccountRoutes([[
