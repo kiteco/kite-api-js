@@ -1321,6 +1321,67 @@ describe('KiteAPI', () => {
     });
   });
 
+  describe('.login()', () => {
+    withKite({logged: false}, () => {
+      describe('when the request succeeds', () => {
+        withKiteRoutes([[
+          o => /\/clientapi\/login/.test(o.path),
+          o => fakeResponse(200),
+        ]], () => {
+          it('returns a promise that is resolved after calling the endpoint', () => {
+            return waitsForPromise(() => KiteAPI.login({
+              email: 'foo@bar.com',
+              password: 'foo',
+            }));
+          });
+
+          it('calls the provided callback', () => {
+            const spy = sinon.spy();
+            return waitsForPromise(() => KiteAPI.login({
+              email: 'foo@bar.com',
+              password: 'foo',
+            }, spy).then(() => {
+              expect(spy.called).to.be.ok();
+            }));
+          });
+        });
+      });
+
+      describe('when called without an email', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+          KiteAPI.login({
+            password: 'foo',
+          }));
+        });
+      });
+
+      describe('when called without a password', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () =>
+          KiteAPI.login({
+            email: 'foo@bar.com',
+          }));
+        });
+      });
+
+      describe('when called without any data', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.login());
+        });
+      });
+
+      describe('when the request fails', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.login({
+            email: 'foo@bar.com',
+            password: 'foo',
+          }));
+        });
+      });
+    });
+  });
+
 
   describe('.Account', () => {
     describe('.initClient()', () => {
