@@ -181,6 +181,16 @@ KiteAPI.getSupportedLanguages().then(languages => {
 })
 ```
 
+#### .getOnboardingFilePath()
+
+Makes a request to the onboarding_file endpoint and returns a promise that resolves with a filepath string.
+
+```js
+KiteAPI.getOnboardingFilePath().then(path => {
+  // do something with path
+})
+```
+
 #### .getHoverDataAtPosition(filename, source, position, editor)
 #### .getReportDataAtPosition(filename, source, position, editor)
 #### .getSymbolReportDataForId(id)
