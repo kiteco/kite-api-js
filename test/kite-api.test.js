@@ -365,6 +365,20 @@ describe('KiteAPI', () => {
       });
     });
 
+    describe('.getOnboardingFilePath()', () => {
+      withKiteRoutes([[
+        o => o.path === '/clientapi/plugins/onboarding_file',
+        o => fakeResponse(200, JSON.stringify('/path/to/onboarding_file.py')),
+      ]]);
+
+      it('returns a promise that resolves with an onboarding file path', () => {
+        return waitsForPromise(() => KiteAPI.getOnboardingFilePath())
+        .then(path => {
+          expect(path).to.equal('/path/to/onboarding_file.py');
+        });
+      });
+    });
+
     describe('.getHoverDataAtPosition()', () => {
       const source = loadFixture('sources/json-dump.py');
       const filename = '/path/to/json-dump.py';

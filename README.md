@@ -83,6 +83,24 @@ KiteAPI.requestJSON({path}).then(data => {
 })
 ```
 
+#### .setKiteSetting(key, value)
+
+Makes a `POST` request to Kite at the endpoint `/clientapi/settings/${key}`, where the body is set to `value`. It automatically parses the JSON response when the status code is `200`
+
+```js
+KiteAPI.setKiteSetting('some_setting_name', 'a_value')
+```
+
+#### .getKiteSetting(key)
+
+Makes a `GET` request to Kite at the endpoint `/clientapi/settings/${key}`. It automatically parses the JSON response when the status code is `200`
+
+```js
+KiteAPI.getKiteSetting('some_setting').then(settingValue => {
+  // do something with settingValue
+})
+```
+
 #### .canAuthenticateUser()
 
 Returns a promise that resolves if a user can be authenticated. A user can be authenticated if Kite is reachable and if the user is not already logged into Kite.
@@ -178,6 +196,16 @@ Makes a request to the languages endpoint and returns a promise that resolves wi
 ```js
 KiteAPI.getSupportedLanguages().then(languages => {
   // do something with languages
+})
+```
+
+#### .getOnboardingFilePath()
+
+Makes a request to the onboarding_file endpoint and returns a promise that resolves with a filepath string.
+
+```js
+KiteAPI.getOnboardingFilePath().then(path => {
+  // do something with path
 })
 ```
 
