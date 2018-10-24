@@ -1,6 +1,6 @@
 {
   "name": "kite-api",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "API methods to access Kite",
   "main": "lib/index.js",
   "repository": {
