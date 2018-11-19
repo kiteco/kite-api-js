@@ -67,6 +67,14 @@ describe('KiteAPI', () => {
     });
   });
 
+  describe('.isKiteLocal()', () => {
+    it('returns a boolean resolving promise', () => {
+      return KiteAPI.isKiteLocal().then((isLocal) => {
+        expect(isLocal).to.be.a('boolean')
+      })
+    })
+  })
+
   describe('.canAuthenticateUser()', () => {
     withKite({reachable: false}, () => {
       it('returns a rejecting promise', () => {
