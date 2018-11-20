@@ -83,6 +83,16 @@ KiteAPI.requestJSON({path}).then(data => {
 })
 ```
 
+#### .isKiteLocal()
+
+Makes a `GET` request to Kite at the endpoint `/clientapi/iskitelocal`. Responds with a boolean resolving Promise to `true` in the case of a `200` status code, `false` otherwise
+
+```js
+KiteAPI.isKiteLocal().then(isLocal => {
+  // do stuff related to kite-locality
+})
+```
+
 #### .setKiteSetting(key, value)
 
 Makes a `POST` request to Kite at the endpoint `/clientapi/settings/${key}`, where the body is set to `value`. It automatically parses the JSON response when the status code is `200`
