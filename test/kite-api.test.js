@@ -13,7 +13,7 @@ const {fakeResponse} = require('kite-connector/test/helpers/http');
 const KiteAPI = require('../lib');
 const {merge} = require('../lib/utils');
 const MemoryStore = require('../lib/stores/memory');
-const {withKite, withKiteRoutes, withKiteLogin, withKitePaths, withKiteAccountRoutes} = require('./helpers/kite');
+const {withKite, withKiteRoutes, withKiteLogin, withKiteAccountRoutes} = require('./helpers/kite');
 const {loadFixture, getHugeSource} = require('./helpers/fixtures');
 const {parseParams} = require('./helpers/urls');
 const {hasMandatoryArguments, sendsPayload} = require('./helpers/arguments');
@@ -70,10 +70,10 @@ describe('KiteAPI', () => {
   describe('.isKiteLocal()', () => {
     it('returns a boolean resolving promise', () => {
       return KiteAPI.isKiteLocal().then((isLocal) => {
-        expect(isLocal).to.be.a('boolean')
-      })
-    })
-  })
+        expect(isLocal).to.be.a('boolean');
+      });
+    });
+  });
 
   describe('.canAuthenticateUser()', () => {
     withKite({reachable: false}, () => {
@@ -170,189 +170,6 @@ describe('KiteAPI', () => {
         it('returns a rejected promise', () => {
           return waitsForPromise({shouldReject: true}, () =>
             KiteAPI.authenticateSessionID('key'));
-        });
-      });
-    });
-  });
-
-  describe('.isPathWhitelisted()', () => {
-    hasMandatoryArguments((args) => KiteAPI.isPathWhitelisted(...args), [
-      '/path/to/file.py',
-    ]);
-
-    withKite({logged: false}, () => {
-      withKitePaths({}, 401);
-
-      it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () =>
-          KiteAPI.isPathWhitelisted('/path/to/dir'));
-      });
-    });
-
-    withKite({logged: true}, () => {
-      withKitePaths({
-        whitelist: ['/path/to/dir'],
-      });
-
-      describe('passing a path not in the whitelist', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.isPathWhitelisted('/path/to/other/dir'));
-        });
-
-        it('emits a did-detect-non-whitelisted-path event', () => {
-          const spy = sinon.spy();
-          KiteAPI.onDidDetectNonWhitelistedPath(spy);
-
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.isPathWhitelisted('/path/to/other/dir'))
-          .then(() => {
-            expect(spy.called).to.be.ok();
-          });
-        });
-      });
-
-      describe('passing a path in the whitelist', () => {
-        it('returns a resolving promise', () => {
-          return waitsForPromise(() =>
-            KiteAPI.isPathWhitelisted('/path/to/dir'));
-        });
-
-        it('emits a did-detect-whitelisted-path event', () => {
-          const spy = sinon.spy();
-          KiteAPI.onDidDetectWhitelistedPath(spy);
-
-          return waitsForPromise(() =>
-            KiteAPI.isPathWhitelisted('/path/to/dir'))
-          .then(() => {
-            expect(spy.called).to.be.ok();
-          });
-        });
-      });
-    });
-  });
-
-  describe('.canWhitelistPath()', () => {
-    hasMandatoryArguments((args) => KiteAPI.canWhitelistPath(...args), [
-      '/path/to/file.py',
-    ]);
-
-    withKite({logged: false}, () => {
-      withKitePaths({}, 401);
-      it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () =>
-          KiteAPI.canWhitelistPath('/path/to/dir'));
-      });
-    });
-
-    withKite({logged: true}, () => {
-      withKitePaths({
-        whitelist: ['/path/to/dir'],
-      });
-      describe('passing a path in the whitelist', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.canWhitelistPath('/path/to/dir'));
-        });
-      });
-
-      describe('passing a path not in the whitelist', () => {
-        it('returns a resolving promise', () => {
-          return waitsForPromise(() =>
-            KiteAPI.canWhitelistPath('/path/to/other/dir'));
-        });
-      });
-    });
-  });
-
-  describe('.whitelistPath()', () => {
-    hasMandatoryArguments((args) => KiteAPI.whitelistPath(...args), [
-      '/path/to/file.py',
-    ]);
-
-    withKite({logged: false}, () => {
-      withKitePaths({}, 401);
-      it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () =>
-          KiteAPI.whitelistPath('/path/to/dir'));
-      });
-    });
-
-    withKite({logged: true}, () => {
-      withKitePaths({
-        whitelist: ['/path/to/dir'],
-      });
-
-      describe('passing a path in the whitelist', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.whitelistPath('/path/to/dir'));
-        });
-      });
-
-      describe('passing a path not in the whitelist', () => {
-        describe('and the request succeeds', () => {
-          it('returns a resolving promise', () => {
-            return waitsForPromise(() =>
-            KiteAPI.whitelistPath('/path/to/other/dir'));
-          });
-        });
-
-        describe('and the request fails', () => {
-          withKiteRoutes([[
-            o => /^\/clientapi\/permissions\/whitelist/.test(o.path),
-            o => fakeResponse(500),
-          ]]);
-          it('returns a rejected promise', () => {
-            return waitsForPromise({shouldReject: true}, () =>
-              KiteAPI.whitelistPath('/path/to/other/dir'));
-          });
-        });
-      });
-    });
-  });
-
-  describe('.blacklistPath()', () => {
-    hasMandatoryArguments((args) => KiteAPI.blacklistPath(...args), [
-      '/path/to/file.py',
-    ]);
-
-    withKite({logged: false}, () => {
-      withKitePaths({}, 401);
-      it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () =>
-          KiteAPI.blacklistPath('/path/to/dir'));
-      });
-    });
-
-    withKite({logged: true}, () => {
-      withKitePaths({
-        whitelist: ['/path/to/dir'],
-      });
-      describe('passing a path in the whitelist', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.blacklistPath('/path/to/dir'));
-        });
-      });
-
-      describe('passing a path not in the whitelist', () => {
-        describe('and the request succeeds', () => {
-          it('returns a resolving promise', () => {
-            return waitsForPromise(() =>
-              KiteAPI.blacklistPath('/path/to/other/dir'));
-          });
-        });
-
-        describe('and the request fails', () => {
-          withKiteRoutes([[
-            o => /^\/clientapi\/permissions\/blacklist/.test(o.path),
-            o => fakeResponse(500),
-          ]]);
-          it('returns a rejected promise', () => {
-            return waitsForPromise({shouldReject: true}, () =>
-              KiteAPI.blacklistPath('/path/to/other/dir'));
-          });
         });
       });
     });
@@ -756,78 +573,6 @@ describe('KiteAPI', () => {
 
         it('returns a promise that is rejected', () => {
           return waitsForPromise({shouldReject: true}, () => KiteAPI.getUserAccountInfo());
-        });
-      });
-    });
-
-    describe('.isFileAuthorized()', () => {
-      withKitePaths({
-        whitelist: ['/path/to/dir'],
-      });
-
-      hasMandatoryArguments((args) => KiteAPI.isFileAuthorized(...args), [
-        '/some/path/to/a/file.py',
-      ]);
-
-      describe('when the file is in the whitelist', () => {
-        it('returns a resolving promise', () => {
-          return waitsForPromise(() =>
-            KiteAPI.isFileAuthorized('/path/to/dir/file.py'));
-        });
-      });
-
-      describe('when the file is not in the whitelist', () => {
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.isFileAuthorized('/path/to/other/dir/file.py'));
-        });
-      });
-    });
-
-    describe('.shouldOfferWhitelist()', () => {
-      withKitePaths({
-        whitelist: ['/path/to/dir'],
-        blacklist: ['/path/to/other/dir'],
-        ignored: ['/path/to/ignored/dir'],
-      });
-
-      hasMandatoryArguments((args) => KiteAPI.shouldOfferWhitelist(...args), [
-        '/some/path/to/a/file.py',
-      ]);
-
-      describe('for a path in the whitelist', () => {
-        it('returns null', () => {
-          return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/dir/file.py'))
-          .then(res => {
-            expect(res).to.eql(null);
-          });
-        });
-      });
-
-      describe('for a path in the blacklist', () => {
-        it('returns null', () => {
-          return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/other/dir/file.py'))
-          .then(res => {
-            expect(res).to.eql(null);
-          });
-        });
-      });
-
-      describe('for a path in the ignore list', () => {
-        it('returns null', () => {
-          return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/ignored/dir/file.py'))
-          .then(res => {
-            expect(res).to.eql(null);
-          });
-        });
-      });
-
-      describe('for a path not in the whitelist', () => {
-        it('returns the preferred path to whitelist', () => {
-          return waitsForPromise(() => KiteAPI.shouldOfferWhitelist('/path/to/some/file.py'))
-          .then(res => {
-            expect(res).to.eql('/path/to/some');
-          });
         });
       });
     });

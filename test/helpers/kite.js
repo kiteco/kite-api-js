@@ -40,97 +40,6 @@ function updateKitePaths(paths) {
   }
 }
 
-function withKitePaths(paths = {}, defaultStatus, block) {
-  const eventRe = /^\/clientapi\/editor\/event$/;
-  const authRe = /^\/clientapi\/permissions\/authorized\?filename=(.+)$/;
-  const projectDirRe = /^\/clientapi\/projectdir\?filename=(.+)$/;
-  const notifyRe = /^\/clientapi\/permissions\/notify\?filename=(.+)$/;
-  const blacklistRe = /^\/clientapi\/permissions\/blacklist/;
-  const whitelistRe = /^\/clientapi\/permissions\/whitelist/;
-
-  const whitelisted = match =>
-    (kitedPaths.whitelist || []).some(p => match.startsWith(p));
-  const blacklisted = match =>
-    (kitedPaths.blacklist || []).some(p => match.startsWith(p));
-  const ignored = match =>
-    (kitedPaths.ignored || []).some(p => match.startsWith(p));
-
-  const routes = [
-    [
-      o => {
-        return o.method === 'POST' && eventRe.test(o.path);
-      },
-      (o, data) => {
-        let filename;
-        if (data) {
-          ({filename} = JSON.parse(data));
-        }
-
-        return data &&
-               whitelisted(filename) &&
-               !ignored(filename)
-                ? fakeResponse(200)
-                : fakeResponse(403);
-      },
-    ], [
-      o => notifyRe.exec(o.path),
-      o => {
-        const match = notifyRe.exec(o.path);
-        return match &&
-               !whitelisted(match[1]) &&
-               !ignored(match[1]) &&
-               !blacklisted(match[1])
-          ? fakeResponse(200)
-          : fakeResponse(403);
-      },
-    ], [
-      o => {
-        const match = authRe.exec(o.path);
-        return match && whitelisted(match[1]) && !ignored(match[1]);
-      },
-      o => fakeResponse(defaultStatus || 200),
-    ], [
-      o => {
-        const match = authRe.exec(o.path);
-        return match && (!whitelisted(match[1]) || ignored(match[1]));
-      },
-      o => fakeResponse(defaultStatus || 403),
-    ], [
-      o => {
-        const match = projectDirRe.exec(o.path);
-        return o.method === 'GET' && match && blacklisted(match[1]);
-      },
-      o => fakeResponse(defaultStatus || 403),
-    ], [
-      o => projectDirRe.test(o.path),
-      o => {
-        const match = projectDirRe.exec(o.path);
-        return fakeResponse(defaultStatus || 200, path.dirname(match[1]));
-      },
-    ], [
-      (o, data) => {
-        data = data && JSON.parse(data);
-        const [path] = data && Array.isArray(data) ? data : [];
-        return whitelistRe.test(o.path) &&
-               !(whitelisted(path) || blacklisted(path)) &&
-               o.method === 'PUT';
-      },
-      o => fakeResponse(defaultStatus || 200),
-    ], [
-      (o, data) => {
-        data = data ? JSON.parse(data) : {};
-        const path = data.paths ? data.paths[0] : null;
-        return blacklistRe.test(o.path) &&
-               !(whitelisted(path) || blacklisted(path)) &&
-               o.method === 'PUT';
-      },
-      o => fakeResponse(defaultStatus || 200),
-    ],
-  ];
-  beforeEach(() => { updateKitePaths(paths); });
-  withKiteRoutes(routes, block);
-}
-
 function withKiteAccountRoutes(routes = [], block) {
   let safeClient;
 
@@ -163,6 +72,5 @@ module.exports = {
   withKite,
   withKiteRoutes,
   withKiteLogin,
-  withKitePaths,
   withKiteAccountRoutes,
 };
