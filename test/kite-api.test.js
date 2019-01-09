@@ -49,7 +49,6 @@ describe('KiteAPI', () => {
     'isKiteSupported',
     'isOSSupported',
     'isOSVersionSupported',
-    'isUserAuthenticated',
     'onDidFailRequest',
     'request',
     'runKite',
@@ -75,107 +74,7 @@ describe('KiteAPI', () => {
     });
   });
 
-  describe('.canAuthenticateUser()', () => {
-    withKite({reachable: false}, () => {
-      it('returns a rejecting promise', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteAPI.canAuthenticateUser());
-      });
-    });
-
-    withKite({logged: true}, () => {
-      it('returns a rejecting promise', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteAPI.canAuthenticateUser());
-      });
-    });
-
-    withKite({logged: false}, () => {
-      it('returns a resolving promise', () => {
-        return waitsForPromise(() => KiteAPI.canAuthenticateUser());
-      });
-    });
-  });
-
-  describe('.authenticateUser()', () => {
-    hasMandatoryArguments((args) => KiteAPI.authenticateUser(...args), [
-      'email', 'password',
-    ]);
-
-    withKite({reachable: false}, () => {
-      it('returns a rejected promise', () => {
-        waitsForPromise({shouldReject: true}, () => KiteAPI.canAuthenticateUser());
-      });
-    });
-
-    withKite({reachable: true}, () => {
-      describe('and the authentication succeeds', () => {
-        withKiteLogin(200);
-
-        it('returns a resolving promise', () => {
-          return waitsForPromise(() =>
-            KiteAPI.authenticateUser('email', 'password'));
-        });
-
-        it('writes the user id in the editor config', () => {
-          return waitsForPromise(() => KiteAPI.authenticateUser('email', 'password'))
-          .then(() => KiteAPI.editorConfig.get('distinctID'))
-          .then(id => {
-            expect(id).to.eql('some-id');
-          });
-        });
-      });
-
-      describe('and the authentication fails', () => {
-        withKiteLogin(401);
-
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.authenticateUser('email', 'password'));
-        });
-      });
-    });
-  });
-
-  describe('.authenticateSessionID()', () => {
-    hasMandatoryArguments((args) => KiteAPI.authenticateSessionID(...args), [
-      'key',
-    ]);
-
-    withKite({reachable: false}, () => {
-      it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteAPI.canAuthenticateUser());
-      });
-    });
-
-    withKite({reachable: true}, () => {
-      describe('and the authentication succeeds', () => {
-        withKiteLogin(200);
-
-        it('returns a resolving promise', () => {
-          return waitsForPromise(() =>
-            KiteAPI.authenticateSessionID('key'));
-        });
-
-        it('writes the user id in the editor config', () => {
-          return waitsForPromise(() => KiteAPI.authenticateUser('email', 'password'))
-          .then(() => KiteAPI.editorConfig.get('distinctID'))
-          .then(id => {
-            expect(id).to.eql('some-id');
-          });
-        });
-      });
-
-      describe('and the authentication fails', () => {
-        withKiteLogin(401);
-
-        it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.authenticateSessionID('key'));
-        });
-      });
-    });
-  });
-
-  withKite({logged: true}, () => {
+  withKite({reachable: true}, () => {
     describe('.getSupportedLanguages()', () => {
       withKiteRoutes([[
         o => o.path === '/clientapi/languages',
