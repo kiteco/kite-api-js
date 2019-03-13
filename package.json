@@ -1,6 +1,6 @@
 {
   "name": "kite-api",
-  "version": "2.13.0",
+  "version": "2.14.0",
   "description": "API methods to access Kite",
   "main": "lib/index.js",
   "repository": {
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "md5": "^2.2.0",
-    "kite-connector": "^2.7.0"
+    "kite-connector": "^2.8.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
