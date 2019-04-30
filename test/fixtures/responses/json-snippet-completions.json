@@ -1,0 +1,191 @@
+{
+    "completions":[
+       {
+          "snippet":{
+             "text":"JSONEncoder",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"JSONEncoder",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"dump",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"dump",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"dumps",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"dumps",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"loads",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"loads",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"JSONDecodeError",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"JSONDecodeError",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"encoder",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"encoder",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"load",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"load",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"scanner",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"scanner",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"decoder",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"decoder",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"tool",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"tool",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       },
+       {
+          "snippet":{
+             "text":"JSONDecoder",
+             "placeholders":[
+ 
+             ]
+          },
+          "replace":{
+             "begin":17,
+             "end":17
+          },
+          "display":"JSONDecoder",
+          "hint":"unknown",
+          "documentation":{
+             "text":"this is a dummy docstring"
+          }
+       }
+    ]
+ }

@@ -572,6 +572,66 @@ describe('KiteAPI', () => {
       });
     });
 
+    describe('.getSnippetCompletionsAtPosition()', () => {
+      const source = loadFixture('sources/json-completions.py');
+      const filename = '/path/to/json-completions.py';
+
+      hasMandatoryArguments((args) => KiteAPI.getCompletionsAtPosition(...args), [
+        filename, source, 'editor', 1,
+      ]);
+
+      sendsPayload(() => {
+        KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17);
+      }, {
+        text: source,
+        editor: 'editor',
+        filename,
+        position: {
+          begin: 17,
+          end: 17,
+        },
+      });
+
+      describe('when there are completions returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/complete',
+          o => fakeResponse(200, loadFixture('responses/json-snippet-completions.json')),
+        ]]);
+
+        it('returns a promise that resolves with the completions', () => {
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
+          .then(completions => {
+            expect(completions.length).to.eql(11);
+            expect(completions[0].display).to.eql('JSONEncoder');
+          });
+        });
+      });
+
+      describe('when an error status is returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/editor/complete',
+          o => fakeResponse(404),
+        ]]);
+
+        it('returns a promise that resolves with an empty array', () => {
+          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 'editor', 17))
+          .then(completions => {
+            expect(completions.length).to.eql(0);
+          });
+        });
+      });
+
+      describe('when the provided file is too big', () => {
+        it('returns a promise that resolves with an empty array without making the request', () => {
+          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, getHugeSource(), 'editor', 1))
+          .then(completions => {
+            expect(completions.length).to.eql(0);
+            expect(KiteConnector.client.request.called).not.to.be.ok();
+          });
+        });
+      });
+    });
+
     describe('.getSignaturesAtPosition()', () => {
       const source = loadFixture('sources/json-dump.py');
       const filename = '/path/to/json-dump.py';
