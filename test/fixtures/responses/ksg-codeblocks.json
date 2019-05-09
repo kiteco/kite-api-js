@@ -1,0 +1,79 @@
+{
+  "query": "python http get",
+  "answers": [
+      {
+          "answer_id": 54856660,
+          "code_blocks": [
+              "urllib3",
+              "import urllib3\n\npool_manager = urllib3.PoolManager()\n",
+              "example_request = pool_manager.request(\"GET\", \"https://example.com\")\n\nprint(example_request.data.decode(\"utf-8\")) # Response text.\nprint(example_request.status) # Status code.\nprint(example_request.headers[\"Content-Type\"]) # Content type.\n",
+              "example_request = pool_manager.request(\"GET\", \"https://example.com\", headers = {\n    \"Header1\": \"value1\",\n    \"Header2\": \"value2\"\n})\n"
+          ]
+      },
+      {
+          "answer_id": 15869929,
+          "code_blocks": [
+              "import requests\nr = requests.get(\"http://example.com/foo/bar\")\n",
+              ">>> print(r.status_code)\n>>> print(r.headers)\n>>> print(r.content)\n"
+          ]
+      },
+      {
+          "answer_id": 52351509,
+          "code_blocks": [
+              "import urllib.request\ncontents = urllib.request.urlopen(urllib.request.Request(\n    \"https://api.github.com/repos/cirosantilli/linux-kernel-module-cheat/releases/latest\",\n    headers={\"Accept\" : 'application/vnd.github.full+json\"text/html'}\n)).read()\nprint(contents)\n",
+              "import urllib2\ncontents = urllib2.urlopen(urllib2.Request(\n    \"https://api.github.com\",\n    headers={\"Accept\" : 'application/vnd.github.full+json\"text/html'}\n)).read()\nprint(contents)\n"
+          ]
+      },
+      {
+          "answer_id": 646213,
+          "code_blocks": [
+              "import httplib2\nresp, content = httplib2.Http().request(\"http://example.com/foo/bar\")\n"
+          ]
+      },
+      {
+          "answer_id": 645318,
+          "code_blocks": [
+              "import urllib2\ncontents = urllib2.urlopen(\"http://example.com/foo/bar\").read()\n",
+              "import urllib.request\ncontents = urllib.request.urlopen(\"http://example.com/foo/bar\").read()\n"
+          ]
+      },
+      {
+          "answer_id": 48050751,
+          "code_blocks": [
+              "try:\n    import urllib2 as urlreq # Python 2.x\nexcept:\n    import urllib.request as urlreq # Python 3.x\nreq = urlreq.Request(\"http://example.com/foo/bar\")\nreq.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36')\nurlreq.urlopen(req).read()\n",
+              "urllib2.HTTPError: HTTP Error 403: Forbidden",
+              "urllib.error.HTTPError: HTTP Error 403: Forbidden"
+          ]
+      },
+      {
+          "answer_id": 646159,
+          "code_blocks": [
+              "import httplib2\n\nresp, content = httplib2.Http().request(\"http://example.com/foo/bar\")\n"
+          ]
+      },
+      {
+          "answer_id": 31029124,
+          "code_blocks": [
+              "import sys, urllib.request\n\ndef reporthook(a, b, c):\n    print (\"% 3.1f%% of %d bytes\\r\" % (min(100, float(a * b) / c * 100), c))\n    sys.stdout.flush()\nfor url in sys.argv[1:]:\n    i = url.rfind(\"/\")\n    file = url[i+1:]\n    print (url, \"->\", file)\n    urllib.request.urlretrieve(url, file, reporthook)\nprint\n"
+          ]
+      },
+      {
+          "answer_id": 23813181,
+          "code_blocks": [
+              "from nap.url import Url\napi = Url('https://api.github.com')\n\ngists = api.join('gists')\nresponse = gists.get(params={'since': '2014-05-01T00:00:00Z'})\nprint(response.json())\n"
+          ]
+      },
+      {
+          "answer_id": 2003547,
+          "code_blocks": [
+              "import sys, urllib\n\ndef reporthook(a, b, c):\n    print \"% 3.1f%% of %d bytes\\r\" % (min(100, float(a * b) / c * 100), c),\n    sys.stdout.flush()\nfor url in sys.argv[1:]:\n    i = url.rfind(\"/\")\n    file = url[i+1:]\n    print url, \"->\", file\n    urllib.urlretrieve(url, file, reporthook)\nprint\n"
+          ]
+      },
+      {
+          "answer_id": 646229,
+          "code_blocks": [
+              "# From python cookbook, 2nd edition, page 487\nimport sys, urllib\n\ndef reporthook(a, b, c):\n    print \"% 3.1f%% of %d bytes\\r\" % (min(100, float(a * b) / c * 100), c),\nfor url in sys.argv[1:]:\n    i = url.rfind(\"/\")\n    file = url[i+1:]\n    print url, \"->\", file\n    urllib.urlretrieve(url, file, reporthook)\nprint\n"
+          ]
+      }
+  ]
+}
