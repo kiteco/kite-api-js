@@ -522,12 +522,13 @@ describe('KiteAPI', () => {
       ]);
 
       sendsPayload(() => {
-        KiteAPI.getCompletionsAtPosition(filename, source, 1, 'editor');
+        KiteAPI.getCompletionsAtPosition(filename, source, 1, 'editor', 'utf-16');
       }, {
         text: source,
         editor: 'editor',
         filename,
         cursor_runes: 1,
+        offset_encoding: 'utf-16',
       });
 
       describe('when there are completions returned by kited', () => {
@@ -537,7 +538,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with the completions', () => {
-          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 18, 'editor'))
+          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 18, 'editor', 'utf-16'))
           .then(completions => {
             expect(completions.length).to.eql(12);
 
@@ -553,7 +554,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with an empty array', () => {
-          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 18, 'editor'))
+          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 18, 'editor', 'utf-16'))
           .then(completions => {
             expect(completions.length).to.eql(0);
           });
@@ -562,7 +563,7 @@ describe('KiteAPI', () => {
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with an empty array without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, getHugeSource(), 18, 'editor'))
+          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, getHugeSource(), 18, 'editor', 'utf-16'))
           .then(completions => {
             expect(completions.length).to.eql(0);
 
@@ -576,7 +577,7 @@ describe('KiteAPI', () => {
       const source = loadFixture('sources/json-completions.py');
       const filename = '/path/to/json-completions.py';
 
-      hasMandatoryArguments((args) => KiteAPI.getCompletionsAtPosition(...args), [
+      hasMandatoryArguments((args) => KiteAPI.getSnippetCompletionsAtPosition(...args), [
         filename, source, 'editor', 1,
       ]);
 
@@ -614,7 +615,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with an empty array', () => {
-          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 'editor', 17))
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
           .then(completions => {
             expect(completions.length).to.eql(0);
           });
@@ -623,7 +624,7 @@ describe('KiteAPI', () => {
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with an empty array without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, getHugeSource(), 'editor', 1))
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, getHugeSource(), 'editor', 1))
           .then(completions => {
             expect(completions.length).to.eql(0);
             expect(KiteConnector.client.request.called).not.to.be.ok();
@@ -637,11 +638,11 @@ describe('KiteAPI', () => {
       const filename = '/path/to/json-dump.py';
 
       hasMandatoryArguments((args) => KiteAPI.getSignaturesAtPosition(...args), [
-        filename, source, 1, 'editor',
+        filename, source, 1, 'editor', 'utf-16',
       ]);
 
       sendsPayload(() => {
-        KiteAPI.getSignaturesAtPosition(filename, source, 1, 'editor');
+        KiteAPI.getSignaturesAtPosition(filename, source, 1, 'editor', 'utf-16');
       }, {
         text: source,
         editor: 'editor',
@@ -656,7 +657,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with the completions', () => {
-          return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor'))
+          return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor', 'utf-16'))
           .then(signature => {
             expect(signature).not.to.be(undefined);
           });
@@ -670,7 +671,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with undefined', () => {
-          return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor'))
+          return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor', 'utf-16'))
           .then(signature => {
             expect(signature).to.be(undefined);
           });
@@ -679,7 +680,8 @@ describe('KiteAPI', () => {
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with undefined without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, getHugeSource(), 18, 'editor'))
+          return waitsForPromise(() => 
+            KiteAPI.getSignaturesAtPosition(filename, getHugeSource(), 18, 'editor', 'utf-16'))
           .then(signature => {
             expect(signature).to.be(undefined);
 
