@@ -119,7 +119,7 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with the returned data', () => {
           return waitsForPromise(() =>
-            KiteAPI.getHoverDataAtPosition(filename, source, 18, 'editor'))
+            KiteAPI.getHoverDataAtPosition(filename, source, 18, 'editor', 'utf-16'))
           .then(data => {
             const editorHash = md5(source);
             const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
@@ -131,6 +131,7 @@ describe('KiteAPI', () => {
             const params = parseParams(parsedURL.query);
 
             expect(params.cursor_runes).to.eql('18');
+            expect(params.offset_encoding).to.eql('utf-16');
             expect(data).to.eql({foo: 'bar'});
           });
         });
@@ -146,7 +147,7 @@ describe('KiteAPI', () => {
 
         it('returns a rejected promise', () => {
           return waitsForPromise({shouldReject: true}, () =>
-            KiteAPI.getHoverDataAtPosition(filename, source, 18, 'editor'));
+            KiteAPI.getHoverDataAtPosition(filename, source, 18, 'editor', 'utf-16'));
         });
       });
 
@@ -177,7 +178,7 @@ describe('KiteAPI', () => {
         ]);
 
         it('returns a promise that resolve with the returned hover data', () => {
-          return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor'))
+          return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor', 'utf-16'))
           .then(data => {
             const editorHash = md5(source);
             const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
@@ -187,6 +188,7 @@ describe('KiteAPI', () => {
             const params = parseParams(parsedURL.query);
 
             expect(params.cursor_runes).to.eql('18');
+            expect(params.offset_encoding).to.eql('utf-16');
             expect(data).to.eql([{
               symbol: [{
                 id: 'foo',
@@ -214,7 +216,7 @@ describe('KiteAPI', () => {
         ]);
 
         it('returns a promise that resolve with both the returned report data', () => {
-          return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor'))
+          return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor', 'utf-16'))
           .then(data => {
             const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
             expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
@@ -241,7 +243,7 @@ describe('KiteAPI', () => {
         ]);
 
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor'));
+          return waitsForPromise({shouldReject: true}, () => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor', 'utf-16'));
         });
       });
     });
@@ -582,7 +584,7 @@ describe('KiteAPI', () => {
       ]);
 
       sendsPayload(() => {
-        KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17);
+        KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 'utf-16', 17);
       }, {
         text: source,
         editor: 'editor',
@@ -600,7 +602,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with the completions', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 'utf-16', 17))
           .then(completions => {
             expect(completions.length).to.eql(11);
             expect(completions[0].display).to.eql('JSONEncoder');
@@ -615,7 +617,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with an empty array', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 'utf-16', 17))
           .then(completions => {
             expect(completions.length).to.eql(0);
           });
@@ -624,7 +626,7 @@ describe('KiteAPI', () => {
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with an empty array without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, getHugeSource(), 'editor', 1))
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, getHugeSource(), 'editor', 'utf-16', 1))
           .then(completions => {
             expect(completions.length).to.eql(0);
             expect(KiteConnector.client.request.called).not.to.be.ok();
@@ -648,6 +650,7 @@ describe('KiteAPI', () => {
         editor: 'editor',
         filename,
         cursor_runes: 1,
+        offset_encoding: 'utf-16',
       });
 
       describe('when there is a signature returned by kited', () => {
