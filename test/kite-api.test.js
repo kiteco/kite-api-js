@@ -584,7 +584,7 @@ describe('KiteAPI', () => {
       ]);
 
       sendsPayload(() => {
-        KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 'utf-16', 17);
+        KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17);
       }, {
         text: source,
         editor: 'editor',
@@ -593,6 +593,7 @@ describe('KiteAPI', () => {
           begin: 17,
           end: 17,
         },
+        offset_encoding: 'utf-16',
       });
 
       describe('when there are completions returned by kited', () => {
@@ -602,7 +603,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with the completions', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 'utf-16', 17))
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
           .then(completions => {
             expect(completions.length).to.eql(11);
             expect(completions[0].display).to.eql('JSONEncoder');
@@ -617,7 +618,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with an empty array', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 'utf-16', 17))
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
           .then(completions => {
             expect(completions.length).to.eql(0);
           });
@@ -626,7 +627,7 @@ describe('KiteAPI', () => {
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with an empty array without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, getHugeSource(), 'editor', 'utf-16', 1))
+          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, getHugeSource(), 'editor', 1))
           .then(completions => {
             expect(completions.length).to.eql(0);
             expect(KiteConnector.client.request.called).not.to.be.ok();
