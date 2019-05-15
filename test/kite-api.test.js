@@ -90,13 +90,18 @@ describe('KiteAPI', () => {
     });
 
     describe('.getOnboardingFilePath()', () => {
+      const editor = 'editor';
+      hasMandatoryArguments((args) => KiteAPI.getOnboardingFilePath(...args), [
+        editor,
+      ]);
+
       withKiteRoutes([[
-        o => o.path === '/clientapi/plugins/onboarding_file',
+        o => /^\/clientapi\/plugins\/onboarding_file\?editor=editor&language=python/.test(o.path),
         o => fakeResponse(200, JSON.stringify('/path/to/onboarding_file.py')),
       ]]);
 
       it('returns a promise that resolves with an onboarding file path', () => {
-        return waitsForPromise(() => KiteAPI.getOnboardingFilePath())
+        return waitsForPromise(() => KiteAPI.getOnboardingFilePath(editor))
         .then(path => {
           expect(path).to.equal('/path/to/onboarding_file.py');
         });
