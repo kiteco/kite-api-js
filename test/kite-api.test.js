@@ -724,7 +724,7 @@ describe('KiteAPI', () => {
 
       describe('when there is a KSG Code Block response to be returned by kited', () => {
         withKiteRoutes([[
-          o => o.path === '/clientapi/ksg/codeblocks?query=fake',
+          o => o.path === '/clientapi/ksg/codeblocks?query=fake&results=3',
           o => fakeResponse(200, loadFixture('responses/ksg-codeblocks.json')), //TODO: need to create fixture
         ]]);
 
@@ -738,7 +738,7 @@ describe('KiteAPI', () => {
 
       describe('when an error status is returned by kited', () => {
         withKiteRoutes([[
-          o => o.path === '/clientapi/ksg/codeblocks?query=fake',
+          o => o.path === '/clientapi/ksg/codeblocks?query=fake&results=3',
           o => fakeResponse(404),
         ]]);
 
