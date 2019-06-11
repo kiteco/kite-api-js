@@ -700,6 +700,68 @@ describe('KiteAPI', () => {
       });
     });
 
+    describe('.getKSGCompletions()', () => {
+
+      describe('when there is a KSG completions response to be returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/ksg/completions?query=fake',
+          o => fakeResponse(200, loadFixture('responses/ksg-completions.json')), //TODO: need to create fixture
+        ]]);
+
+        it('returns a promise that resolves with KSG completions', () => {
+          return waitsForPromise(() => KiteAPI.getKSGCompletions('fake'))
+          .then(completions => {
+            expect(completions).not.to.be(undefined);
+          });
+        });
+      });
+
+      describe('when an error status is returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/ksg/completions?query=fake',
+          o => fakeResponse(404),
+        ]]);
+
+        it('returns a promise that resolves with undefined', () => {
+          return waitsForPromise(() => KiteAPI.getKSGCompletions('fake'))
+          .then(completions => {
+            expect(completions).to.be(undefined);
+          });
+        });
+      });
+    });
+
+    describe('.getKSGCodeBlocks()', () => {
+
+      describe('when there is a KSG Code Block response to be returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/ksg/codeblocks?query=fake&results=3',
+          o => fakeResponse(200, loadFixture('responses/ksg-codeblocks.json')), //TODO: need to create fixture
+        ]]);
+
+        it('returns a promise that resolves with KSG Code Blocks', () => {
+          return waitsForPromise(() => KiteAPI.getKSGCodeBlocks('fake'))
+          .then(completions => {
+            expect(completions).not.to.be(undefined);
+          });
+        });
+      });
+
+      describe('when an error status is returned by kited', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/ksg/codeblocks?query=fake&results=3',
+          o => fakeResponse(404),
+        ]]);
+
+        it('returns a promise that resolves with undefined', () => {
+          return waitsForPromise(() => KiteAPI.getKSGCodeBlocks('fake'))
+          .then(completions => {
+            expect(completions).to.be(undefined);
+          });
+        });
+      });
+    });
+
     describe('.getAutocorrectData()', () => {
       const source = loadFixture('sources/errored.py');
       const filename = '/path/to/errored.py';
