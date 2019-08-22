@@ -351,6 +351,10 @@ A proxy to the [`KiteConnector.onDidFailRequest`](https://github.com/kiteco/kite
 
 A proxy to the [`KiteConnector.request`](https://github.com/kiteco/kite-connect-js/blob/master/README.md#requestoptions-data-timeout) method.
 
+##### .runKiteWithCopilot()
+
+A proxy to the [`KiteConnector.runKiteWithCopilot`](https://github.com/kiteco/kite-connect-js/blob/master/README.md#runkitewithcopilot) method.
+
 ##### .runKite()
 
 A proxy to the [`KiteConnector.runKite`](https://github.com/kiteco/kite-connect-js/blob/master/README.md#runkite) method.
