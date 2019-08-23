@@ -51,6 +51,7 @@ describe('KiteAPI', () => {
     'isOSVersionSupported',
     'onDidFailRequest',
     'request',
+    'runKiteWithCopilot',
     'runKite',
     'runKiteAndWait',
     'runKiteEnterprise',
