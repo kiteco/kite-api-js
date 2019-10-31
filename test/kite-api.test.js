@@ -7,16 +7,16 @@ const https = require('https');
 const sinon = require('sinon');
 const expect = require('expect.js');
 const KiteConnector = require('kite-connector');
-const {waitsForPromise} = require('kite-connector/test/helpers/async');
-const {fakeResponse} = require('kite-connector/test/helpers/http');
+const { waitsForPromise } = require('kite-connector/test/helpers/async');
+const { fakeResponse } = require('kite-connector/test/helpers/http');
 
 const KiteAPI = require('../lib');
-const {merge} = require('../lib/utils');
+const { merge } = require('../lib/utils');
 const MemoryStore = require('../lib/stores/memory');
-const {withKite, withKiteRoutes, withKiteLogin, withKiteAccountRoutes} = require('./helpers/kite');
-const {loadFixture, getHugeSource} = require('./helpers/fixtures');
-const {parseParams} = require('./helpers/urls');
-const {hasMandatoryArguments, sendsPayload} = require('./helpers/arguments');
+const { withKite, withKiteRoutes, withKiteLogin, withKiteAccountRoutes } = require('./helpers/kite');
+const { loadFixture, getHugeSource } = require('./helpers/fixtures');
+const { parseParams } = require('./helpers/urls');
+const { hasMandatoryArguments, sendsPayload } = require('./helpers/arguments');
 
 const mandatoryEditorMeta = {
   source: 'editor',
@@ -60,7 +60,7 @@ describe('KiteAPI', () => {
     'waitForKite',
   ].forEach(method => {
     it(`delegates calls to ${method} to the connector`, () => {
-      const stub = sinon.stub(KiteConnector, method).callsFake(() => {});
+      const stub = sinon.stub(KiteConnector, method).callsFake(() => { });
       KiteAPI[method]('foo', 'bar');
       expect(KiteConnector[method].calledWith('foo', 'bar')).to.be.ok();
       stub.restore();
@@ -75,7 +75,7 @@ describe('KiteAPI', () => {
     });
   });
 
-  withKite({reachable: true}, () => {
+  withKite({ reachable: true }, () => {
     describe('.getSupportedLanguages()', () => {
       withKiteRoutes([[
         o => o.path === '/clientapi/languages',
@@ -84,9 +84,9 @@ describe('KiteAPI', () => {
 
       it('returns a promise that resolve with the supported languages', () => {
         return waitsForPromise(() => KiteAPI.getSupportedLanguages())
-        .then(languages => {
-          expect(languages).to.eql(['javascript', 'python']);
-        });
+          .then(languages => {
+            expect(languages).to.eql(['javascript', 'python']);
+          });
       });
     });
 
@@ -103,9 +103,9 @@ describe('KiteAPI', () => {
 
       it('returns a promise that resolves with an onboarding file path', () => {
         return waitsForPromise(() => KiteAPI.getOnboardingFilePath(editor))
-        .then(path => {
-          expect(path).to.equal('/path/to/onboarding_file.py');
-        });
+          .then(path => {
+            expect(path).to.equal('/path/to/onboarding_file.py');
+          });
       });
     });
 
@@ -126,20 +126,20 @@ describe('KiteAPI', () => {
         it('returns a promise that resolve with the returned data', () => {
           return waitsForPromise(() =>
             KiteAPI.getHoverDataAtPosition(filename, source, 18, 'editor', 'utf-16'))
-          .then(data => {
-            const editorHash = md5(source);
-            const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
+            .then(data => {
+              const editorHash = md5(source);
+              const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
 
-            expect(parsedURL.path.indexOf(filename.replace(/\//g, ':'))).not.to.eql(-1);
-            expect(parsedURL.path.indexOf(editorHash)).not.to.eql(-1);
-            expect(parsedURL.path.indexOf('/editor/')).not.to.eql(-1);
+              expect(parsedURL.path.indexOf(filename.replace(/\//g, ':'))).not.to.eql(-1);
+              expect(parsedURL.path.indexOf(editorHash)).not.to.eql(-1);
+              expect(parsedURL.path.indexOf('/editor/')).not.to.eql(-1);
 
-            const params = parseParams(parsedURL.query);
+              const params = parseParams(parsedURL.query);
 
-            expect(params.cursor_runes).to.eql('18');
-            expect(params.offset_encoding).to.eql('utf-16');
-            expect(data).to.eql({foo: 'bar'});
-          });
+              expect(params.cursor_runes).to.eql('18');
+              expect(params.offset_encoding).to.eql('utf-16');
+              expect(data).to.eql({ foo: 'bar' });
+            });
         });
       });
 
@@ -152,7 +152,7 @@ describe('KiteAPI', () => {
         ]);
 
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
+          return waitsForPromise({ shouldReject: true }, () =>
             KiteAPI.getHoverDataAtPosition(filename, source, 18, 'editor', 'utf-16'));
         });
       });
@@ -185,23 +185,23 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with the returned hover data', () => {
           return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor', 'utf-16'))
-          .then(data => {
-            const editorHash = md5(source);
-            const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
+            .then(data => {
+              const editorHash = md5(source);
+              const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
 
-            expect(parsedURL.path.indexOf(filename.replace(/\//g, ':'))).not.to.eql(-1);
-            expect(parsedURL.path.indexOf(editorHash)).not.to.eql(-1);
-            const params = parseParams(parsedURL.query);
+              expect(parsedURL.path.indexOf(filename.replace(/\//g, ':'))).not.to.eql(-1);
+              expect(parsedURL.path.indexOf(editorHash)).not.to.eql(-1);
+              const params = parseParams(parsedURL.query);
 
-            expect(params.cursor_runes).to.eql('18');
-            expect(params.offset_encoding).to.eql('utf-16');
-            expect(data).to.eql([{
-              symbol: [{
-                id: 'foo',
-                value: [],
-              }],
-            }]);
-          });
+              expect(params.cursor_runes).to.eql('18');
+              expect(params.offset_encoding).to.eql('utf-16');
+              expect(data).to.eql([{
+                symbol: [{
+                  id: 'foo',
+                  value: [],
+                }],
+              }]);
+            });
         });
       });
 
@@ -223,20 +223,20 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with both the returned report data', () => {
           return waitsForPromise(() => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor', 'utf-16'))
-          .then(data => {
-            const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
-            expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
+            .then(data => {
+              const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
+              expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
 
-            expect(data).to.eql([
-              {
-                symbol: [{
-                  id: 'foo',
-                  value: [],
-                }],
-              },
-            {bar: 'foo'},
-            ]);
-          });
+              expect(data).to.eql([
+                {
+                  symbol: [{
+                    id: 'foo',
+                    value: [],
+                  }],
+                },
+                { bar: 'foo' },
+              ]);
+            });
         });
       });
 
@@ -249,7 +249,7 @@ describe('KiteAPI', () => {
         ]);
 
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor', 'utf-16'));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.getReportDataAtPosition(filename, source, 18, 'editor', 'utf-16'));
         });
       });
     });
@@ -267,13 +267,13 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with the returned hover data', () => {
           return waitsForPromise(() => KiteAPI.getValueReportDataForId('foo'))
-          .then(data => {
-            const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
+            .then(data => {
+              const parsedURL = url.parse(KiteConnector.client.request.lastCall.args[0].path);
 
-            expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
+              expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
 
-            expect(data).to.eql({foo: 'bar'});
-          });
+              expect(data).to.eql({ foo: 'bar' });
+            });
         });
 
         describe('when the response value does not have an id', () => {
@@ -284,9 +284,9 @@ describe('KiteAPI', () => {
 
           it('sets the value id using the provided one', () => {
             return waitsForPromise(() => KiteAPI.getValueReportDataForId('foo'))
-            .then(data => {
-              expect(data.value.id).to.eql('foo');
-            });
+              .then(data => {
+                expect(data.value.id).to.eql('foo');
+              });
           });
         });
       });
@@ -298,7 +298,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that is rejected', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getValueReportDataForId('foo'));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.getValueReportDataForId('foo'));
         });
       });
     });
@@ -316,13 +316,13 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with the returned members data', () => {
           return waitsForPromise(() => KiteAPI.getMembersDataForId('foo'))
-          .then(data => {
-            const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
+            .then(data => {
+              const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
 
-            expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
+              expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
 
-            expect(data).to.eql({foo: 'bar'});
-          });
+              expect(data).to.eql({ foo: 'bar' });
+            });
         });
       });
 
@@ -333,7 +333,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that is rejected', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getMembersDataForId('foo'));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.getMembersDataForId('foo'));
         });
       });
     });
@@ -351,13 +351,13 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with the returned members data', () => {
           return waitsForPromise(() => KiteAPI.getUsagesDataForValueId('foo'))
-          .then(data => {
-            const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
+            .then(data => {
+              const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
 
-            expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
+              expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
 
-            expect(data).to.eql({foo: 'bar'});
-          });
+              expect(data).to.eql({ foo: 'bar' });
+            });
         });
       });
 
@@ -368,7 +368,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that is rejected', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getUsagesDataForValueId('foo'));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.getUsagesDataForValueId('foo'));
         });
       });
     });
@@ -386,13 +386,13 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with the returned usage data', () => {
           return waitsForPromise(() => KiteAPI.getUsageDataForId('foo'))
-          .then(data => {
-            const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
+            .then(data => {
+              const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
 
-            expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
+              expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
 
-            expect(data).to.eql({foo: 'bar'});
-          });
+              expect(data).to.eql({ foo: 'bar' });
+            });
         });
 
         describe('when the response value does not have an id', () => {
@@ -403,9 +403,9 @@ describe('KiteAPI', () => {
 
           it('sets the value id using the provided one', () => {
             return waitsForPromise(() => KiteAPI.getUsageDataForId('foo'))
-            .then(data => {
-              expect(data.value.id).to.eql('foo');
-            });
+              .then(data => {
+                expect(data.value.id).to.eql('foo');
+              });
           });
         });
       });
@@ -417,7 +417,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that is rejected', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getUsageDataForId('foo'));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.getUsageDataForId('foo'));
         });
       });
     });
@@ -435,13 +435,13 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with the returned example data', () => {
           return waitsForPromise(() => KiteAPI.getExampleDataForId('foo'))
-          .then(data => {
-            const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
+            .then(data => {
+              const parsedURL = url.parse(KiteConnector.client.request.getCall(0).args[0].path);
 
-            expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
+              expect(parsedURL.path.indexOf('/foo')).not.to.eql(-1);
 
-            expect(data).to.eql({foo: 'bar'});
-          });
+              expect(data).to.eql({ foo: 'bar' });
+            });
         });
       });
 
@@ -452,7 +452,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that is rejected', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getExampleDataForId('foo'));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.getExampleDataForId('foo'));
         });
       });
     });
@@ -466,9 +466,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolve with the returned example data', () => {
           return waitsForPromise(() => KiteAPI.getUserAccountInfo())
-          .then(data => {
-            expect(data).to.eql({foo: 'bar'});
-          });
+            .then(data => {
+              expect(data).to.eql({ foo: 'bar' });
+            });
         });
       });
 
@@ -479,7 +479,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that is rejected', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.getUserAccountInfo());
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.getUserAccountInfo());
         });
       });
     });
@@ -488,9 +488,9 @@ describe('KiteAPI', () => {
       describe('when called without a filename', () => {
         it('returns a promise that resolves to a ready state', () => {
           return waitsForPromise(() => KiteAPI.getStatus())
-          .then(status => {
-            expect(status).to.eql({status: 'ready'});
-          });
+            .then(status => {
+              expect(status).to.eql({ status: 'ready' });
+            });
         });
       });
 
@@ -501,9 +501,9 @@ describe('KiteAPI', () => {
         ]]);
         it('returns a promise that resolves to a ready state', () => {
           return waitsForPromise(() => KiteAPI.getStatus('/path/to/dir/file.py'))
-          .then(status => {
-            expect(status).to.eql({status: 'ready'});
-          });
+            .then(status => {
+              expect(status).to.eql({ status: 'ready' });
+            });
         });
       });
 
@@ -514,69 +514,9 @@ describe('KiteAPI', () => {
         ]]);
         it('returns a promise that resolves to the received state', () => {
           return waitsForPromise(() => KiteAPI.getStatus('/path/to/dir/file.py'))
-          .then(status => {
-            expect(status).to.eql({status: 'indexing'});
-          });
-        });
-      });
-    });
-
-    describe('.getCompletionsAtPosition()', () => {
-      const source = loadFixture('sources/json-completions.py');
-      const filename = '/path/to/json-completions.py';
-
-      hasMandatoryArguments((args) => KiteAPI.getCompletionsAtPosition(...args), [
-        filename, source, 1, 'editor',
-      ]);
-
-      sendsPayload(() => {
-        KiteAPI.getCompletionsAtPosition(filename, source, 1, 'editor', 'utf-16');
-      }, {
-        text: source,
-        editor: 'editor',
-        filename,
-        cursor_runes: 1,
-        offset_encoding: 'utf-16',
-      });
-
-      describe('when there are completions returned by kited', () => {
-        withKiteRoutes([[
-          o => o.path === '/clientapi/editor/completions',
-          o => fakeResponse(200, loadFixture('responses/json-completions.json')),
-        ]]);
-
-        it('returns a promise that resolves with the completions', () => {
-          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 18, 'editor', 'utf-16'))
-          .then(completions => {
-            expect(completions.length).to.eql(12);
-
-            expect(completions[0].display).to.eql('dumps');
-          });
-        });
-      });
-
-      describe('when an error status is returned by kited', () => {
-        withKiteRoutes([[
-          o => o.path === '/clientapi/editor/completions',
-          o => fakeResponse(404),
-        ]]);
-
-        it('returns a promise that resolves with an empty array', () => {
-          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, source, 18, 'editor', 'utf-16'))
-          .then(completions => {
-            expect(completions.length).to.eql(0);
-          });
-        });
-      });
-
-      describe('when the provided file is too big', () => {
-        it('returns a promise that resolves with an empty array without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getCompletionsAtPosition(filename, getHugeSource(), 18, 'editor', 'utf-16'))
-          .then(completions => {
-            expect(completions.length).to.eql(0);
-
-            expect(KiteConnector.client.request.called).not.to.be.ok();
-          });
+            .then(status => {
+              expect(status).to.eql({ status: 'indexing' });
+            });
         });
       });
     });
@@ -594,7 +534,7 @@ describe('KiteAPI', () => {
           end: 17,
         },
         offset_encoding: 'utf-16',
-      }
+      };
 
       hasMandatoryArguments((args) => KiteAPI.getCompletions(...args), [{}]);
 
@@ -607,11 +547,11 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with the completions', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
-          .then(completions => {
-            expect(completions.length).to.eql(11);
-            expect(completions[0].display).to.eql('JSONEncoder');
-          });
+          return waitsForPromise(() => KiteAPI.getCompletions(payload))
+            .then(completions => {
+              expect(completions.length).to.eql(11);
+              expect(completions[0].display).to.eql('JSONEncoder');
+            });
         });
       });
 
@@ -622,82 +562,29 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a promise that resolves with an empty array', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
-          .then(completions => {
-            expect(completions.length).to.eql(0);
-          });
+          return waitsForPromise(() => KiteAPI.getCompletions(payload))
+            .then(completions => {
+              expect(completions.length).to.eql(0);
+            });
         });
       });
-
-      describe('when the provided file is too big', () => {
-        it('returns a promise that resolves with an empty array without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, getHugeSource(), 'editor', 1))
-          .then(completions => {
-            expect(completions.length).to.eql(0);
-            expect(KiteConnector.client.request.called).not.to.be.ok();
-          });
-        });
-      });
-    });
-
-
-    describe('.getSnippetCompletionsAtPosition()', () => {
-      const source = loadFixture('sources/json-completions.py');
-      const filename = '/path/to/json-completions.py';
-
-      hasMandatoryArguments((args) => KiteAPI.getSnippetCompletionsAtPosition(...args), [
-        filename, source, 'editor', 1,
-      ]);
-
-      sendsPayload(() => {
-        KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17);
-      }, {
-        text: source,
+      const huge_payload = {
+        text: getHugeSource(),
         editor: 'editor',
         filename,
         position: {
-          begin: 17,
-          end: 17,
+          begin: 1,
+          end: 1,
         },
         offset_encoding: 'utf-16',
-      });
-
-      describe('when there are completions returned by kited', () => {
-        withKiteRoutes([[
-          o => o.path === '/clientapi/editor/complete',
-          o => fakeResponse(200, loadFixture('responses/json-snippet-completions.json')),
-        ]]);
-
-        it('returns a promise that resolves with the completions', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
-          .then(completions => {
-            expect(completions.length).to.eql(11);
-            expect(completions[0].display).to.eql('JSONEncoder');
-          });
-        });
-      });
-
-      describe('when an error status is returned by kited', () => {
-        withKiteRoutes([[
-          o => o.path === '/clientapi/editor/complete',
-          o => fakeResponse(404),
-        ]]);
-
-        it('returns a promise that resolves with an empty array', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, source, 'editor', 17))
-          .then(completions => {
-            expect(completions.length).to.eql(0);
-          });
-        });
-      });
-
+      };
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with an empty array without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getSnippetCompletionsAtPosition(filename, getHugeSource(), 'editor', 1))
-          .then(completions => {
-            expect(completions.length).to.eql(0);
-            expect(KiteConnector.client.request.called).not.to.be.ok();
-          });
+          return waitsForPromise(() => KiteAPI.getCompletions(huge_payload))
+            .then(completions => {
+              expect(completions.length).to.eql(0);
+              expect(KiteConnector.client.request.called).not.to.be.ok();
+            });
         });
       });
     });
@@ -728,9 +615,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with the completions', () => {
           return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor', 'utf-16'))
-          .then(signature => {
-            expect(signature).not.to.be(undefined);
-          });
+            .then(signature => {
+              expect(signature).not.to.be(undefined);
+            });
         });
       });
 
@@ -742,21 +629,21 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with undefined', () => {
           return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor', 'utf-16'))
-          .then(signature => {
-            expect(signature).to.be(undefined);
-          });
+            .then(signature => {
+              expect(signature).to.be(undefined);
+            });
         });
       });
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with undefined without making the request', () => {
-          return waitsForPromise(() => 
+          return waitsForPromise(() =>
             KiteAPI.getSignaturesAtPosition(filename, getHugeSource(), 18, 'editor', 'utf-16'))
-          .then(signature => {
-            expect(signature).to.be(undefined);
+            .then(signature => {
+              expect(signature).to.be(undefined);
 
-            expect(KiteConnector.client.request.called).not.to.be.ok();
-          });
+              expect(KiteConnector.client.request.called).not.to.be.ok();
+            });
         });
       });
     });
@@ -771,9 +658,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with KSG completions', () => {
           return waitsForPromise(() => KiteAPI.getKSGCompletions('fake'))
-          .then(completions => {
-            expect(completions).not.to.be(undefined);
-          });
+            .then(completions => {
+              expect(completions).not.to.be(undefined);
+            });
         });
       });
 
@@ -785,9 +672,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with undefined', () => {
           return waitsForPromise(() => KiteAPI.getKSGCompletions('fake'))
-          .then(completions => {
-            expect(completions).to.be(undefined);
-          });
+            .then(completions => {
+              expect(completions).to.be(undefined);
+            });
         });
       });
     });
@@ -802,9 +689,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with KSG Code Blocks', () => {
           return waitsForPromise(() => KiteAPI.getKSGCodeBlocks('fake'))
-          .then(completions => {
-            expect(completions).not.to.be(undefined);
-          });
+            .then(completions => {
+              expect(completions).not.to.be(undefined);
+            });
         });
       });
 
@@ -816,9 +703,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with undefined', () => {
           return waitsForPromise(() => KiteAPI.getKSGCodeBlocks('fake'))
-          .then(completions => {
-            expect(completions).to.be(undefined);
-          });
+            .then(completions => {
+              expect(completions).to.be(undefined);
+            });
         });
       });
     });
@@ -851,9 +738,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with the autocorrect data', () => {
           return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, source, mandatoryEditorMeta))
-          .then(autocorrect => {
-            expect(autocorrect).not.to.be(undefined);
-          });
+            .then(autocorrect => {
+              expect(autocorrect).not.to.be(undefined);
+            });
         });
       });
 
@@ -865,20 +752,20 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with undefined', () => {
           return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, source, mandatoryEditorMeta))
-          .then(autocorrect => {
-            expect(autocorrect).to.be(undefined);
-          });
+            .then(autocorrect => {
+              expect(autocorrect).to.be(undefined);
+            });
         });
       });
 
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves with undefined without making the request', () => {
           return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, getHugeSource(), mandatoryEditorMeta))
-          .then(autocorrect => {
-            expect(autocorrect).to.be(undefined);
+            .then(autocorrect => {
+              expect(autocorrect).to.be(undefined);
 
-            expect(KiteConnector.client.request.called).not.to.be.ok();
-          });
+              expect(KiteConnector.client.request.called).not.to.be.ok();
+            });
         });
       });
     });
@@ -907,9 +794,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with the data', () => {
           return waitsForPromise(() => KiteAPI.getAutocorrectModelInfo('version', mandatoryEditorMeta))
-          .then(autocorrect => {
-            expect(autocorrect).not.to.be({foo: 'bar'});
-          });
+            .then(autocorrect => {
+              expect(autocorrect).not.to.be({ foo: 'bar' });
+            });
         });
       });
 
@@ -921,9 +808,9 @@ describe('KiteAPI', () => {
 
         it('returns a promise that resolves with undefined', () => {
           return waitsForPromise(() => KiteAPI.getAutocorrectModelInfo('version', mandatoryEditorMeta))
-          .then(autocorrect => {
-            expect(autocorrect).to.be(undefined);
-          });
+            .then(autocorrect => {
+              expect(autocorrect).to.be(undefined);
+            });
         });
       });
     });
@@ -973,9 +860,9 @@ describe('KiteAPI', () => {
       describe('when the provided file is too big', () => {
         it('returns a promise that resolves without making the request', () => {
           return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, getHugeSource(), mandatoryEditorMeta))
-          .then(autocorrect => {
-            expect(KiteConnector.client.request.called).not.to.be.ok();
-          });
+            .then(autocorrect => {
+              expect(KiteConnector.client.request.called).not.to.be.ok();
+            });
         });
       });
     });
@@ -1071,7 +958,7 @@ describe('KiteAPI', () => {
       hasMandatoryArguments((args) => KiteAPI.sendFeatureMetric(...args), [name]);
 
       sendsPayload(() => {
-        KiteAPI.sendFeatureMetric(name).catch(err => {});
+        KiteAPI.sendFeatureMetric(name).catch(err => { });
       }, {
         name,
         value: 1,
@@ -1096,7 +983,7 @@ describe('KiteAPI', () => {
         ]]);
 
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
+          return waitsForPromise({ shouldReject: true }, () =>
             KiteAPI.sendFeatureMetric(name));
         });
       });
@@ -1237,20 +1124,20 @@ describe('KiteAPI', () => {
 
       describe('when called without an email', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.checkEmail({}));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.checkEmail({}));
         });
       });
 
       describe('when called without any data', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.checkEmail());
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.checkEmail());
         });
       });
 
       describe('when the request fails', () => {
         withKiteAccountRoutes([], () => {
           it('returns a rejected promise', () => {
-            return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.checkEmail({
+            return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.checkEmail({
               email: 'foo@bar.com',
             }));
           });
@@ -1275,9 +1162,9 @@ describe('KiteAPI', () => {
             return waitsForPromise(() => KiteAPI.Account.createAccount({
               email: 'foo@bar.com',
             }, spy))
-            .then(() => {
-              expect(spy.called).to.be.ok();
-            });
+              .then(() => {
+                expect(spy.called).to.be.ok();
+              });
           });
         });
       });
@@ -1309,20 +1196,20 @@ describe('KiteAPI', () => {
 
       describe('when called without an email', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.createAccount({}));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.createAccount({}));
         });
       });
 
       describe('when called without any data', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.createAccount());
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.createAccount());
         });
       });
 
       describe('when the request fails', () => {
         withKiteAccountRoutes([], () => {
           it('returns a rejected promise', () => {
-            return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.createAccount({
+            return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.createAccount({
               email: 'foo@bar.com',
             }));
           });
@@ -1357,32 +1244,32 @@ describe('KiteAPI', () => {
 
       describe('when called without an email', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-          KiteAPI.Account.login({
-            password: 'foo',
-          }));
+          return waitsForPromise({ shouldReject: true }, () =>
+            KiteAPI.Account.login({
+              password: 'foo',
+            }));
         });
       });
 
       describe('when called without a password', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-          KiteAPI.Account.login({
-            email: 'foo@bar.com',
-          }));
+          return waitsForPromise({ shouldReject: true }, () =>
+            KiteAPI.Account.login({
+              email: 'foo@bar.com',
+            }));
         });
       });
 
       describe('when called without any data', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.login());
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.login());
         });
       });
 
       describe('when the request fails', () => {
         withKiteAccountRoutes([], () => {
           it('returns a rejected promise', () => {
-            return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.login({
+            return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.login({
               email: 'foo@bar.com',
               password: 'foo',
             }));
@@ -1408,29 +1295,29 @@ describe('KiteAPI', () => {
             return waitsForPromise(() => KiteAPI.Account.resetPassword({
               email: 'foo@bar.com',
             }, spy))
-            .then(() => {
-              expect(spy.called).to.be.ok();
-            });
+              .then(() => {
+                expect(spy.called).to.be.ok();
+              });
           });
         });
       });
 
       describe('when called without an email', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.resetPassword({}));
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.resetPassword({}));
         });
       });
 
       describe('when called without any data', () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.resetPassword());
+          return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.resetPassword());
         });
       });
 
       describe('when the request fails', () => {
         withKiteAccountRoutes([], () => {
           it('returns a rejected promise', () => {
-            return waitsForPromise({shouldReject: true}, () => KiteAPI.Account.resetPassword({
+            return waitsForPromise({ shouldReject: true }, () => KiteAPI.Account.resetPassword({
               email: 'foo@bar.com',
             }));
           });
