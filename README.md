@@ -6,15 +6,15 @@
 
 An object containing the constant values of the various states of `kited`
 
-|State|Value|Alias|
-|---|---|---|
-|UNSUPPORTED|`0`||
-|UNINSTALLED|`1`||
-|NOT_RUNNING|`2`|INSTALLED|
-|NOT_REACHABLE|`3`|RUNNING|
-|UNLOGGED|`4`|REACHABLE|
-|NOT_WHITELISTED|`5`|AUTHENTICATED|
-|WHITELISTED|`6`|&nbsp;|
+| State           | Value | Alias         |
+| --------------- | ----- | ------------- |
+| UNSUPPORTED     | `0`   |               |
+| UNINSTALLED     | `1`   |               |
+| NOT_RUNNING     | `2`   | INSTALLED     |
+| NOT_REACHABLE   | `3`   | RUNNING       |
+| UNLOGGED        | `4`   | REACHABLE     |
+| NOT_WHITELISTED | `5`   | AUTHENTICATED |
+| WHITELISTED     | `6`   | &nbsp;        |
 
 #### .editorConfig
 
@@ -233,7 +233,7 @@ KiteAPI.getOnboardingFilePath().then(path => {
 #### .shouldNotify(filename)
 #### .projectDirForFile(filename)
 #### .getStatus(filename)
-#### .getCompletionsAtPosition(filename, source, position, editor)
+#### .getCompletions(payload)
 #### .getSignaturesAtPosition(filename, source, position, editor)
 #### .getAutocorrectData(filename, source, editorMeta)
 #### .getAutocorrectModelInfo(version, editorMeta)
