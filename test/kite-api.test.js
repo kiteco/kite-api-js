@@ -13,8 +13,8 @@ const { fakeResponse } = require('kite-connector/test/helpers/http');
 const KiteAPI = require('../lib');
 const { merge } = require('../lib/utils');
 const MemoryStore = require('../lib/stores/memory');
-const { withKite, withKiteRoutes, withKiteLogin, withKiteAccountRoutes } = require('./helpers/kite');
-const { loadFixture, getHugeSource } = require('./helpers/fixtures');
+const { withKite, withKiteRoutes, withKiteAccountRoutes } = require('./helpers/kite');
+const { loadFixture } = require('./helpers/fixtures');
 const { parseParams } = require('./helpers/urls');
 const { hasMandatoryArguments, sendsPayload } = require('./helpers/arguments');
 
@@ -568,25 +568,6 @@ describe('KiteAPI', () => {
             });
         });
       });
-      const huge_payload = {
-        text: getHugeSource(),
-        editor: 'editor',
-        filename,
-        position: {
-          begin: 1,
-          end: 1,
-        },
-        offset_encoding: 'utf-16',
-      };
-      describe('when the provided file is too big', () => {
-        it('returns a promise that resolves with an empty array without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getCompletions(huge_payload))
-            .then(completions => {
-              expect(completions.length).to.eql(0);
-              expect(KiteConnector.client.request.called).not.to.be.ok();
-            });
-        });
-      });
     });
 
     describe('.getSignaturesAtPosition()', () => {
@@ -631,18 +612,6 @@ describe('KiteAPI', () => {
           return waitsForPromise(() => KiteAPI.getSignaturesAtPosition(filename, source, 18, 'editor', 'utf-16'))
             .then(signature => {
               expect(signature).to.be(undefined);
-            });
-        });
-      });
-
-      describe('when the provided file is too big', () => {
-        it('returns a promise that resolves with undefined without making the request', () => {
-          return waitsForPromise(() =>
-            KiteAPI.getSignaturesAtPosition(filename, getHugeSource(), 18, 'editor', 'utf-16'))
-            .then(signature => {
-              expect(signature).to.be(undefined);
-
-              expect(KiteConnector.client.request.called).not.to.be.ok();
             });
         });
       });
@@ -757,17 +726,6 @@ describe('KiteAPI', () => {
             });
         });
       });
-
-      describe('when the provided file is too big', () => {
-        it('returns a promise that resolves with undefined without making the request', () => {
-          return waitsForPromise(() => KiteAPI.getAutocorrectData(filename, getHugeSource(), mandatoryEditorMeta))
-            .then(autocorrect => {
-              expect(autocorrect).to.be(undefined);
-
-              expect(KiteConnector.client.request.called).not.to.be.ok();
-            });
-        });
-      });
     });
 
     describe('.getAutocorrectModelInfo()', () => {
@@ -854,15 +812,6 @@ describe('KiteAPI', () => {
 
         it('returns a resolving promise', () => {
           return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, source, mandatoryEditorMeta));
-        });
-      });
-
-      describe('when the provided file is too big', () => {
-        it('returns a promise that resolves without making the request', () => {
-          return waitsForPromise(() => KiteAPI.postSaveValidationData(filename, getHugeSource(), mandatoryEditorMeta))
-            .then(autocorrect => {
-              expect(KiteConnector.client.request.called).not.to.be.ok();
-            });
         });
       });
     });
