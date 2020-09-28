@@ -96,10 +96,10 @@ describe('KiteAPI', () => {
           o => fakeResponse(400),
         ]]);
 
-        it('returns a promise that resolves with the max file size in bytes', () => {
+        it('returns a promise that resolves with the default max file size in bytes', () => {
           return waitsForPromise(() => KiteAPI.getMaxFileSizeBytes())
             .then(res => {
-              expect(res).to.eql(1048576);
+              expect(res).to.eql(KiteAPI.DEFAULT_MAX_FILE_SIZE);
             });
         });
       });
