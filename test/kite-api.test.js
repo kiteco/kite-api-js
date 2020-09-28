@@ -77,16 +77,31 @@ describe('KiteAPI', () => {
 
   withKite({ reachable: true }, () => {
     describe('.getMaxFileSizeBytes()', () => {
-      withKiteRoutes([[
-        o => o.path === '/clientapi/settings/max_file_size_kb',
-        o => fakeResponse(200, 1024),
-      ]]);
+      describe('when the request succeeds', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/settings/max_file_size_kb',
+          o => fakeResponse(200, 75),
+        ]]);
 
-      it('returns a promise that resolves with the max file size in bytes', () => {
-        return waitsForPromise(() => KiteAPI.getMaxFileSizeBytes())
-          .then(res => {
-            expect(res).to.eql(1048576);
-          });
+        it('returns a promise that resolves with the max file size in bytes', () => {
+          return waitsForPromise(() => KiteAPI.getMaxFileSizeBytes())
+            .then(res => {
+              expect(res).to.eql(76800);
+            });
+        });
+      });
+      describe('when the request fails', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/settings/max_file_size_kb',
+          o => fakeResponse(400),
+        ]]);
+
+        it('returns a promise that resolves with the max file size in bytes', () => {
+          return waitsForPromise(() => KiteAPI.getMaxFileSizeBytes())
+            .then(res => {
+              expect(res).to.eql(1048576);
+            });
+        });
       });
     });
 
