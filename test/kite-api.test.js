@@ -76,6 +76,20 @@ describe('KiteAPI', () => {
   });
 
   withKite({ reachable: true }, () => {
+    describe('.getMaxFileSizeBytes()', () => {
+      withKiteRoutes([[
+        o => o.path === '/clientapi/settings/max_file_size_kb',
+        o => fakeResponse(200, 1024),
+      ]]);
+
+      it('returns a promise that resolves with the max file size in bytes', () => {
+        return waitsForPromise(() => KiteAPI.getMaxFileSizeBytes())
+          .then(res => {
+            expect(res).to.eql(1048576);
+          });
+      });
+    });
+
     describe('.getSupportedLanguages()', () => {
       withKiteRoutes([[
         o => o.path === '/clientapi/languages',
