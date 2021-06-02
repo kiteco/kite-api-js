@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "md5": "^2.2.0",
-    "kite-connector": "=3.14.0"
+    "kite-connector": "=3.16.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
